@@ -14,18 +14,19 @@
     .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
     .btn-primary { background: #02585a; border-color: #02585a; }
     .btn-primary:hover { background: #014040; border-color: #014040; }
-    .badge-status { padding: 4px 10px; border-radius: 20px; font-size: .75rem; }
-    .status-aberto    { background: #ffeeba; color: #856404; }
-    .status-em_preparo{ background: #b8daff; color: #004085; }
-    .status-pronto    { background: #c3e6cb; color: #155724; }
-    .status-entregue  { background: #d4edda; color: #155724; }
-    .status-cancelado { background: #f5c6cb; color: #721c24; }
-    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; }
+    .badge-status { padding: 4px 10px; border-radius: 20px; font-size: .75rem; display: inline-block; }
+    .status-aberto     { background: #ffeeba; color: #856404; }
+    .status-empreparo  { background: #b8daff; color: #004085; }
+    .status-pronto     { background: #c3e6cb; color: #155724; }
+    .status-entregue   { background: #d4edda; color: #155724; }
+    .status-cancelado  { background: #f5c6cb; color: #721c24; }
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; width: 320px; }
     .section { display: none; }
     .section.active { display: block; }
     #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #02585a; }
     .login-card { max-width: 380px; width: 100%; }
     #app-screen { display: none; }
+    .item-pedido { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -54,8 +55,8 @@
     <div class="container-fluid">
       <span class="navbar-brand">☕ Gato do Luar</span>
       <div class="d-flex gap-3 align-items-center">
-        <a class="nav-link active" href="#" onclick="mostrarSecao('produtos')">Produtos</a>
-        <a class="nav-link" href="#" onclick="mostrarSecao('pedidos')">Pedidos</a>
+        <a class="nav-link active" href="#" onclick="mostrarSecao('produtos', event)">Produtos</a>
+        <a class="nav-link" href="#" onclick="mostrarSecao('pedidos', event)">Pedidos</a>
         <span class="nav-link text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
       </div>
@@ -72,11 +73,9 @@
       </div>
       <div class="card">
         <div class="card-body p-0">
-          <table class="table mb-0" id="tabela-produtos">
+          <table class="table mb-0">
             <thead class="table-light">
-              <tr>
-                <th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th>
-              </tr>
+              <tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr>
             </thead>
             <tbody id="tbody-produtos">
               <tr><td colspan="6" class="text-center text-muted py-3">Carregando...</td></tr>
@@ -96,9 +95,7 @@
         <div class="card-body p-0">
           <table class="table mb-0">
             <thead class="table-light">
-              <tr>
-                <th>#</th><th>Cliente</th><th>Atendente</th><th>Data</th><th>Total</th><th>Status</th><th></th>
-              </tr>
+              <tr><th>#</th><th>Cliente</th><th>Atendente</th><th>Data</th><th>Total</th><th>Status</th><th></th></tr>
             </thead>
             <tbody id="tbody-pedidos">
               <tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr>
@@ -145,8 +142,13 @@
             <input type="number" id="produto-estoque" class="form-control">
           </div>
           <div class="col mb-2">
-            <label class="form-label">Categoria ID</label>
-            <input type="number" id="produto-categoria" class="form-control">
+            <label class="form-label">Categoria</label>
+            <select id="produto-categoria" class="form-select">
+              <option value="1">Cafés</option>
+              <option value="2">Salgados</option>
+              <option value="3">Doces</option>
+              <option value="4">Sucos</option>
+            </select>
           </div>
         </div>
       </div>
@@ -158,14 +160,57 @@
   </div>
 </div>
 
+<!-- MODAL PEDIDO -->
+<div class="modal fade" id="modal-pedido" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Novo Pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">Cliente (opcional)</label>
+            <select id="pedido-cliente" class="form-select">
+              <option value="">Avulso (sem cadastro)</option>
+            </select>
+          </div>
+          <div class="col">
+            <label class="form-label">Observações</label>
+            <input type="text" id="pedido-obs" class="form-control" placeholder="Ex: sem açúcar">
+          </div>
+        </div>
+
+        <hr>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <strong>Itens do pedido</strong>
+          <button class="btn btn-sm btn-outline-primary" onclick="adicionarItem()">+ Adicionar item</button>
+        </div>
+        <div id="lista-itens"></div>
+
+        <div class="mt-3 text-end">
+          <strong>Total: R$ <span id="total-pedido">0,00</span></strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarPedido()">Abrir Pedido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const API = '';  // mesma origem: a API serve o frontend
+const API = '';
 let token = localStorage.getItem('cafeteria_token');
 let usuario = JSON.parse(localStorage.getItem('cafeteria_user') || 'null');
+let produtosDisponiveis = [];
+let itensPedido = [];
 
 // ── AUTENTICAÇÃO ──────────────────────────────────────────
 async function fazerLogin() {
@@ -181,7 +226,7 @@ async function fazerLogin() {
     const data = await res.json();
     if (!data.sucesso) throw new Error(data.mensagem);
     token = data.dados.token;
-    usuario = { nome: data.dados.nome, cargo: data.dados.cargo };
+    usuario = { nome: data.dados.nome, cargo: data.dados.cargo, id: 1 };
     localStorage.setItem('cafeteria_token', token);
     localStorage.setItem('cafeteria_user', JSON.stringify(usuario));
     iniciarApp();
@@ -206,11 +251,12 @@ function iniciarApp() {
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────
-function mostrarSecao(sec) {
+function mostrarSecao(sec, event) {
+  if (event) event.preventDefault();
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + sec).classList.add('active');
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event) event.target.classList.add('active');
   if (sec === 'pedidos') carregarPedidos();
 }
 
@@ -221,8 +267,12 @@ async function carregarProdutos() {
       headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
+    produtosDisponiveis = (data.dados || []).filter(p => p.ativo);
     const tbody = document.getElementById('tbody-produtos');
-    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum produto cadastrado.</td></tr>'; return; }
+    if (!data.dados?.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum produto cadastrado.</td></tr>';
+      return;
+    }
     tbody.innerHTML = data.dados.map(p => `
       <tr>
         <td><strong>${p.nome}</strong><br><small class="text-muted">${p.descricao || ''}</small></td>
@@ -241,7 +291,7 @@ async function carregarProdutos() {
 function abrirModalProduto() {
   document.getElementById('produto-id').value = '';
   document.getElementById('modal-produto-titulo').textContent = 'Novo Produto';
-  ['nome','descricao','preco','custo','estoque','categoria'].forEach(f =>
+  ['nome','descricao','preco','custo','estoque'].forEach(f =>
     document.getElementById('produto-' + f).value = '');
   new bootstrap.Modal(document.getElementById('modal-produto')).show();
 }
@@ -265,7 +315,7 @@ async function salvarProduto() {
     nome: document.getElementById('produto-nome').value,
     descricao: document.getElementById('produto-descricao').value,
     preco: parseFloat(document.getElementById('produto-preco').value),
-    custo: parseFloat(document.getElementById('produto-custo').value),
+    custo: parseFloat(document.getElementById('produto-custo').value) || 0,
     estoque: parseInt(document.getElementById('produto-estoque').value),
     idCategoria: parseInt(document.getElementById('produto-categoria').value),
     ativo: true
@@ -298,21 +348,152 @@ async function carregarPedidos() {
     const res = await fetch(`${API}/api/pedidos`, { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     const tbody = document.getElementById('tbody-pedidos');
-    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum pedido encontrado.</td></tr>'; return; }
-    tbody.innerHTML = data.dados.map(p => `
+    if (!data.dados?.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum pedido encontrado.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.dados.map(p => {
+      const statusClass = p.status.toLowerCase().replace('empreparo','empreparo');
+      return `
       <tr>
         <td>#${p.idPedido}</td>
         <td>${p.cliente || 'Avulso'}</td>
         <td>${p.atendente}</td>
         <td>${new Date(p.dataPedido).toLocaleString('pt-BR')}</td>
         <td>R$ ${p.valorTotal.toFixed(2)}</td>
-        <td><span class="badge-status status-${p.status.toLowerCase()}">${p.status}</span></td>
+        <td><span class="badge-status status-${statusClass}">${p.status}</span></td>
         <td>
           ${p.status !== 'Cancelado' && p.status !== 'Entregue' ? `
+            <select class="form-select form-select-sm d-inline w-auto me-1" onchange="atualizarStatus(${p.idPedido}, this.value)">
+              <option value="">Status...</option>
+              <option value="EmPreparo">Em Preparo</option>
+              <option value="Pronto">Pronto</option>
+              <option value="Entregue">Entregue</option>
+            </select>
             <button class="btn btn-sm btn-outline-danger" onclick="cancelarPedido(${p.idPedido})">Cancelar</button>` : ''}
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   } catch(e) { mostrarToast('Erro ao carregar pedidos.', 'danger'); }
+}
+
+async function abrirModalPedido() {
+  itensPedido = [];
+  document.getElementById('pedido-obs').value = '';
+  document.getElementById('lista-itens').innerHTML = '';
+  document.getElementById('total-pedido').textContent = '0,00';
+
+  // Carregar clientes
+  try {
+    const res = await fetch(`${API}/api/pedidos`, { headers: { Authorization: `Bearer ${token}` } });
+  } catch(e) {}
+
+  // Popular select de produtos
+  await carregarProdutos();
+
+  // Select de clientes — fixo por enquanto
+  document.getElementById('pedido-cliente').innerHTML = `
+    <option value="">Avulso (sem cadastro)</option>
+    <option value="1">Maria Silva</option>
+  `;
+
+  adicionarItem();
+  new bootstrap.Modal(document.getElementById('modal-pedido')).show();
+}
+
+function adicionarItem() {
+  const idx = itensPedido.length;
+  itensPedido.push({ idProduto: '', quantidade: 1, observacao: '' });
+
+  const opcoes = produtosDisponiveis.map(p =>
+    `<option value="${p.idProduto}" data-preco="${p.preco}">${p.nome} — R$ ${p.preco.toFixed(2)}</option>`
+  ).join('');
+
+  const div = document.createElement('div');
+  div.className = 'item-pedido';
+  div.id = `item-${idx}`;
+  div.innerHTML = `
+    <div class="row align-items-center">
+      <div class="col-5">
+        <select class="form-select form-select-sm" onchange="atualizarItem(${idx}, 'idProduto', this.value)">
+          <option value="">Selecione um produto</option>
+          ${opcoes}
+        </select>
+      </div>
+      <div class="col-2">
+        <input type="number" class="form-control form-control-sm" value="1" min="1"
+          onchange="atualizarItem(${idx}, 'quantidade', parseInt(this.value))">
+      </div>
+      <div class="col-4">
+        <input type="text" class="form-control form-control-sm" placeholder="Observação"
+          onchange="atualizarItem(${idx}, 'observacao', this.value)">
+      </div>
+      <div class="col-1 text-end">
+        <button class="btn btn-sm btn-outline-danger" onclick="removerItem(${idx})">✕</button>
+      </div>
+    </div>`;
+  document.getElementById('lista-itens').appendChild(div);
+}
+
+function atualizarItem(idx, campo, valor) {
+  itensPedido[idx][campo] = valor;
+  calcularTotal();
+}
+
+function removerItem(idx) {
+  document.getElementById(`item-${idx}`)?.remove();
+  itensPedido[idx] = null;
+  calcularTotal();
+}
+
+function calcularTotal() {
+  let total = 0;
+  itensPedido.forEach((item, idx) => {
+    if (!item || !item.idProduto) return;
+    const produto = produtosDisponiveis.find(p => p.idProduto == item.idProduto);
+    if (produto) total += produto.preco * (item.quantidade || 1);
+  });
+  document.getElementById('total-pedido').textContent = total.toFixed(2).replace('.', ',');
+}
+
+async function salvarPedido() {
+  const itensValidos = itensPedido.filter(i => i && i.idProduto);
+  if (!itensValidos.length) {
+    mostrarToast('Adicione pelo menos um produto ao pedido.', 'warning');
+    return;
+  }
+
+  const clienteVal = document.getElementById('pedido-cliente').value;
+  const body = {
+    idCliente: clienteVal ? parseInt(clienteVal) : null,
+    idFuncionario: 1,
+    observacoes: document.getElementById('pedido-obs').value,
+    itens: itensValidos.map(i => ({
+      idProduto: parseInt(i.idProduto),
+      quantidade: i.quantidade || 1,
+      observacao: i.observacao || ''
+    }))
+  };
+
+  const res = await fetch(`${API}/api/pedidos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  bootstrap.Modal.getInstance(document.getElementById('modal-pedido')).hide();
+  mostrarToast(data.mensagem || (data.sucesso ? 'Pedido aberto!' : 'Erro'), data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarPedidos();
+}
+
+async function atualizarStatus(id, status) {
+  if (!status) return;
+  const res = await fetch(`${API}/api/pedidos/${id}/status?status=${status}`, {
+    method: 'PUT', headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarPedidos();
 }
 
 async function cancelarPedido(id) {
@@ -327,10 +508,8 @@ async function cancelarPedido(id) {
 
 // ── TOAST ─────────────────────────────────────────────────
 function mostrarToast(msg, tipo = 'success') {
-  const id = 'toast-' + Date.now();
   const el = document.createElement('div');
   el.className = `alert alert-${tipo} alert-dismissible fade show`;
-  el.id = id;
   el.innerHTML = `${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(() => el.remove(), 4000);
