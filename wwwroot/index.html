@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cafeteria Gato do Luar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f5f0; }
+    .navbar { background: #02585a !important; }
+    .navbar-brand { color: #eed3b9 !important; font-weight: 700; }
+    .nav-link { color: #eed3b9 !important; }
+    .nav-link.active { color: #fff !important; border-bottom: 2px solid #eed3b9; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .btn-primary { background: #02585a; border-color: #02585a; }
+    .btn-primary:hover { background: #014040; border-color: #014040; }
+    .badge-status { padding: 4px 10px; border-radius: 20px; font-size: .75rem; }
+    .status-aberto    { background: #ffeeba; color: #856404; }
+    .status-em_preparo{ background: #b8daff; color: #004085; }
+    .status-pronto    { background: #c3e6cb; color: #155724; }
+    .status-entregue  { background: #d4edda; color: #155724; }
+    .status-cancelado { background: #f5c6cb; color: #721c24; }
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; }
+    .section { display: none; }
+    .section.active { display: block; }
+    #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #02585a; }
+    .login-card { max-width: 380px; width: 100%; }
+    #app-screen { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+  <div class="login-card card p-4">
+    <h4 class="text-center mb-1" style="color:#02585a">☕ Gato do Luar</h4>
+    <p class="text-center text-muted small mb-4">Sistema de Gestão da Cafeteria</p>
+    <div class="mb-3">
+      <label class="form-label">E-mail</label>
+      <input type="email" id="login-email" class="form-control" placeholder="seu@email.com">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Senha</label>
+      <input type="password" id="login-senha" class="form-control" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary w-100" onclick="fazerLogin()">Entrar</button>
+    <div id="login-erro" class="text-danger small text-center mt-2"></div>
+  </div>
+</div>
+
+<!-- TELA PRINCIPAL -->
+<div id="app-screen">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <span class="navbar-brand">☕ Gato do Luar</span>
+      <div class="d-flex gap-3 align-items-center">
+        <a class="nav-link active" href="#" onclick="mostrarSecao('produtos')">Produtos</a>
+        <a class="nav-link" href="#" onclick="mostrarSecao('pedidos')">Pedidos</a>
+        <span class="nav-link text-light small" id="usuario-nome"></span>
+        <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+
+    <!-- SEÇÃO PRODUTOS -->
+    <div class="section active" id="sec-produtos">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Cardápio</h5>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalProduto()">+ Novo Produto</button>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table mb-0" id="tabela-produtos">
+            <thead class="table-light">
+              <tr>
+                <th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-produtos">
+              <tr><td colspan="6" class="text-center text-muted py-3">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO PEDIDOS -->
+    <div class="section" id="sec-pedidos">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Pedidos</h5>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalPedido()">+ Novo Pedido</button>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>#</th><th>Cliente</th><th>Atendente</th><th>Data</th><th>Total</th><th>Status</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-pedidos">
+              <tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div class="modal fade" id="modal-produto" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-produto-titulo">Novo Produto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="produto-id">
+        <div class="mb-2">
+          <label class="form-label">Nome</label>
+          <input type="text" id="produto-nome" class="form-control">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Descrição</label>
+          <input type="text" id="produto-descricao" class="form-control">
+        </div>
+        <div class="row">
+          <div class="col mb-2">
+            <label class="form-label">Preço (R$)</label>
+            <input type="number" id="produto-preco" class="form-control" step="0.01">
+          </div>
+          <div class="col mb-2">
+            <label class="form-label">Custo (R$)</label>
+            <input type="number" id="produto-custo" class="form-control" step="0.01">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-2">
+            <label class="form-label">Estoque</label>
+            <input type="number" id="produto-estoque" class="form-control">
+          </div>
+          <div class="col mb-2">
+            <label class="form-label">Categoria ID</label>
+            <input type="number" id="produto-categoria" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = '';  // mesma origem: a API serve o frontend
+let token = localStorage.getItem('cafeteria_token');
+let usuario = JSON.parse(localStorage.getItem('cafeteria_user') || 'null');
+
+// ── AUTENTICAÇÃO ──────────────────────────────────────────
+async function fazerLogin() {
+  const email = document.getElementById('login-email').value;
+  const senha = document.getElementById('login-senha').value;
+  document.getElementById('login-erro').textContent = '';
+  try {
+    const res = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    const data = await res.json();
+    if (!data.sucesso) throw new Error(data.mensagem);
+    token = data.dados.token;
+    usuario = { nome: data.dados.nome, cargo: data.dados.cargo };
+    localStorage.setItem('cafeteria_token', token);
+    localStorage.setItem('cafeteria_user', JSON.stringify(usuario));
+    iniciarApp();
+  } catch (e) {
+    document.getElementById('login-erro').textContent = e.message;
+  }
+}
+
+function sair() {
+  localStorage.removeItem('cafeteria_token');
+  localStorage.removeItem('cafeteria_user');
+  token = null;
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function iniciarApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('usuario-nome').textContent = `${usuario.nome} (${usuario.cargo})`;
+  carregarProdutos();
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
+function mostrarSecao(sec) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + sec).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  event.target.classList.add('active');
+  if (sec === 'pedidos') carregarPedidos();
+}
+
+// ── PRODUTOS ──────────────────────────────────────────────
+async function carregarProdutos() {
+  try {
+    const res = await fetch(`${API}/api/produtos?apenasAtivos=false`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const tbody = document.getElementById('tbody-produtos');
+    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum produto cadastrado.</td></tr>'; return; }
+    tbody.innerHTML = data.dados.map(p => `
+      <tr>
+        <td><strong>${p.nome}</strong><br><small class="text-muted">${p.descricao || ''}</small></td>
+        <td>${p.categoria}</td>
+        <td>R$ ${p.preco.toFixed(2)}</td>
+        <td>${p.estoque}</td>
+        <td><span class="badge ${p.ativo ? 'bg-success' : 'bg-secondary'}">${p.ativo ? 'Ativo' : 'Inativo'}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editarProduto(${p.idProduto})">Editar</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deletarProduto(${p.idProduto})">Desativar</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) { mostrarToast('Erro ao carregar produtos.', 'danger'); }
+}
+
+function abrirModalProduto() {
+  document.getElementById('produto-id').value = '';
+  document.getElementById('modal-produto-titulo').textContent = 'Novo Produto';
+  ['nome','descricao','preco','custo','estoque','categoria'].forEach(f =>
+    document.getElementById('produto-' + f).value = '');
+  new bootstrap.Modal(document.getElementById('modal-produto')).show();
+}
+
+async function editarProduto(id) {
+  const res = await fetch(`${API}/api/produtos/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+  const p = data.dados;
+  document.getElementById('produto-id').value = p.idProduto;
+  document.getElementById('produto-nome').value = p.nome;
+  document.getElementById('produto-descricao').value = p.descricao || '';
+  document.getElementById('produto-preco').value = p.preco;
+  document.getElementById('produto-estoque').value = p.estoque;
+  document.getElementById('modal-produto-titulo').textContent = 'Editar Produto';
+  new bootstrap.Modal(document.getElementById('modal-produto')).show();
+}
+
+async function salvarProduto() {
+  const id = document.getElementById('produto-id').value;
+  const body = {
+    nome: document.getElementById('produto-nome').value,
+    descricao: document.getElementById('produto-descricao').value,
+    preco: parseFloat(document.getElementById('produto-preco').value),
+    custo: parseFloat(document.getElementById('produto-custo').value),
+    estoque: parseInt(document.getElementById('produto-estoque').value),
+    idCategoria: parseInt(document.getElementById('produto-categoria').value),
+    ativo: true
+  };
+  const method = id ? 'PUT' : 'POST';
+  const url = id ? `${API}/api/produtos/${id}` : `${API}/api/produtos`;
+  const res = await fetch(url, {
+    method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  bootstrap.Modal.getInstance(document.getElementById('modal-produto')).hide();
+  mostrarToast(data.mensagem || 'Salvo!', data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarProdutos();
+}
+
+async function deletarProduto(id) {
+  if (!confirm('Desativar este produto?')) return;
+  const res = await fetch(`${API}/api/produtos/${id}`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarProdutos();
+}
+
+// ── PEDIDOS ───────────────────────────────────────────────
+async function carregarPedidos() {
+  try {
+    const res = await fetch(`${API}/api/pedidos`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const tbody = document.getElementById('tbody-pedidos');
+    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum pedido encontrado.</td></tr>'; return; }
+    tbody.innerHTML = data.dados.map(p => `
+      <tr>
+        <td>#${p.idPedido}</td>
+        <td>${p.cliente || 'Avulso'}</td>
+        <td>${p.atendente}</td>
+        <td>${new Date(p.dataPedido).toLocaleString('pt-BR')}</td>
+        <td>R$ ${p.valorTotal.toFixed(2)}</td>
+        <td><span class="badge-status status-${p.status.toLowerCase()}">${p.status}</span></td>
+        <td>
+          ${p.status !== 'Cancelado' && p.status !== 'Entregue' ? `
+            <button class="btn btn-sm btn-outline-danger" onclick="cancelarPedido(${p.idPedido})">Cancelar</button>` : ''}
+        </td>
+      </tr>`).join('');
+  } catch(e) { mostrarToast('Erro ao carregar pedidos.', 'danger'); }
+}
+
+async function cancelarPedido(id) {
+  if (!confirm(`Cancelar pedido #${id}?`)) return;
+  const res = await fetch(`${API}/api/pedidos/${id}`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarPedidos();
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function mostrarToast(msg, tipo = 'success') {
+  const id = 'toast-' + Date.now();
+  const el = document.createElement('div');
+  el.className = `alert alert-${tipo} alert-dismissible fade show`;
+  el.id = id;
+  el.innerHTML = `${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
+if (token && usuario) iniciarApp();
+</script>
+</body>
+</html>
