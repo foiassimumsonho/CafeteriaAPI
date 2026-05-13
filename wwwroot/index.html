@@ -59,6 +59,7 @@
         <a class="nav-link" onclick="mostrarSecao('produtos', this)">Produtos</a>
         <a class="nav-link" onclick="mostrarSecao('clientes', this)">Clientes</a>
         <a class="nav-link" onclick="mostrarSecao('pedidos', this)">Pedidos</a>
+        <a class="nav-link" onclick="mostrarSecao('pagamentos', this)">Pagamentos</a>
         <span class="text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
       </div>
@@ -176,6 +177,25 @@
       </div>
     </div>
 
+
+    <!-- PAGAMENTOS -->
+    <div class="section" id="sec-pagamentos">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Pagamentos</h5>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalPagamento()">+ Registrar Pagamento</button>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr><th>#</th><th>Pedido</th><th>Cliente</th><th>Forma</th><th>Valor</th><th>Data</th></tr>
+            </thead>
+            <tbody id="tbody-pagamentos"><tr><td colspan="6" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -276,6 +296,41 @@
   </div>
 </div>
 
+<!-- MODAL PAGAMENTO -->
+<div class="modal fade" id="modal-pagamento" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar Pagamento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Pedido</label>
+          <select id="pag-pedido" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Forma de Pagamento</label>
+          <select id="pag-forma" class="form-select">
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="CartaoCredito">Cartão de Crédito</option>
+            <option value="CartaoDebito">Cartão de Débito</option>
+            <option value="Pix">Pix</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Valor Pago (R$)</label>
+          <input type="number" id="pag-valor" class="form-control" step="0.01" placeholder="0,00">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarPagamento()">Registrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast-container"></div>
 
@@ -332,6 +387,7 @@ function mostrarSecao(sec, el) {
   if (sec === 'produtos') carregarProdutos();
   if (sec === 'clientes') carregarClientes();
   if (sec === 'pedidos') carregarPedidos();
+  if (sec === 'pagamentos') carregarPagamentos();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────
@@ -620,6 +676,69 @@ async function cancelarPedido(id) {
   const data = await res.json();
   mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
   if (data.sucesso) { carregarPedidos(); carregarDashboard(); }
+}
+
+
+// ── PAGAMENTOS ────────────────────────────────────────────
+async function carregarPagamentos() {
+  try {
+    const res = await fetch('/api/pagamentos', { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const tbody = document.getElementById('tbody-pagamentos');
+    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum pagamento registrado.</td></tr>'; return; }
+    tbody.innerHTML = data.dados.map(p => `
+      <tr>
+        <td>${p.idPagamento}</td>
+        <td>#${p.idPedido}</td>
+        <td>${p.cliente || 'Avulso'}</td>
+        <td>${formaLabel(p.formaPagamento)}</td>
+        <td>R$ ${p.valorPago.toFixed(2)}</td>
+        <td>${p.dataPagamento}</td>
+      </tr>`).join('');
+  } catch(e) { mostrarToast('Erro ao carregar pagamentos.', 'danger'); }
+}
+
+function formaLabel(forma) {
+  const map = { Dinheiro: '💵 Dinheiro', CartaoCredito: '💳 Crédito', CartaoDebito: '💳 Débito', Pix: '📱 Pix' };
+  return map[forma] || forma;
+}
+
+async function abrirModalPagamento() {
+  // Carregar pedidos prontos/em aberto sem pagamento
+  const res = await fetch('/api/pedidos', { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+  const pedidosSemPagamento = (data.dados || []).filter(p => p.status !== 'Cancelado' && p.status !== 'Entregue');
+  const sel = document.getElementById('pag-pedido');
+  if (!pedidosSemPagamento.length) {
+    mostrarToast('Nenhum pedido disponível para pagamento.', 'warning');
+    return;
+  }
+  sel.innerHTML = pedidosSemPagamento.map(p =>
+    `<option value="${p.idPedido}" data-total="${p.valorTotal}">#${p.idPedido} — ${p.cliente || 'Avulso'} — R$ ${p.valorTotal.toFixed(2)}</option>`
+  ).join('');
+  // Preencher valor automaticamente
+  sel.onchange = () => {
+    const opt = sel.selectedOptions[0];
+    document.getElementById('pag-valor').value = opt?.dataset.total || '';
+  };
+  sel.dispatchEvent(new Event('change'));
+  new bootstrap.Modal(document.getElementById('modal-pagamento')).show();
+}
+
+async function salvarPagamento() {
+  const body = {
+    idPedido: parseInt(document.getElementById('pag-pedido').value),
+    formaPagamento: document.getElementById('pag-forma').value,
+    valorPago: parseFloat(document.getElementById('pag-valor').value)
+  };
+  const res = await fetch('/api/pagamentos', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  bootstrap.Modal.getInstance(document.getElementById('modal-pagamento')).hide();
+  mostrarToast(data.mensagem || (data.sucesso ? 'Pagamento registrado!' : 'Erro'), data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) { carregarPagamentos(); carregarDashboard(); }
 }
 
 // ── TOAST ─────────────────────────────────────────────────

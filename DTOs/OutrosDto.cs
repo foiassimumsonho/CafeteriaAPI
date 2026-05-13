@@ -83,7 +83,6 @@ public class FuncionarioCreateDto
 }
 
 // ── RESPOSTA PADRÃO DA API ─────────────────────────────────
-// Todas as respostas da API seguem este formato padronizado
 public class ApiResponse<T>
 {
     public bool Sucesso { get; set; }
@@ -97,8 +96,6 @@ public class ApiResponse<T>
         new() { Sucesso = false, Mensagem = mensagem };
 }
 
-
-
 // ── DASHBOARD ──────────────────────────────────────────────
 public class DashboardDto
 {
@@ -111,4 +108,22 @@ public class DashboardDto
     public int PedidosCancelados { get; set; }
     public int TotalClientes { get; set; }
     public int TotalProdutos { get; set; }
+}
+
+// ── PAGAMENTO ──────────────────────────────────────────────
+public class PagamentoCreateDto
+{
+    public int IdPedido { get; set; }
+    public string FormaPagamento { get; set; } = string.Empty;
+    public decimal ValorPago { get; set; }
+}
+
+public class PagamentoResponseDto
+{
+    public int IdPagamento { get; set; }
+    public int IdPedido { get; set; }
+    public string? Cliente { get; set; }
+    public string FormaPagamento { get; set; } = string.Empty;
+    public decimal ValorPago { get; set; }
+    public string DataPagamento { get; set; } = string.Empty;
 }
