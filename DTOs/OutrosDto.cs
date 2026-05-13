@@ -8,7 +8,7 @@ public class ClienteResponseDto
     public string Email { get; set; } = string.Empty;
     public string? Telefone { get; set; }
     public string? Cpf { get; set; }
-    public DateOnly DataCadastro { get; set; }
+    public string DataCadastro { get; set; } = string.Empty;
     public bool Ativo { get; set; }
 }
 
@@ -95,4 +95,20 @@ public class ApiResponse<T>
 
     public static ApiResponse<T> Erro(string mensagem) =>
         new() { Sucesso = false, Mensagem = mensagem };
+}
+
+
+
+// ── DASHBOARD ──────────────────────────────────────────────
+public class DashboardDto
+{
+    public int TotalPedidosHoje { get; set; }
+    public decimal FaturamentoHoje { get; set; }
+    public int PedidosAbertos { get; set; }
+    public int PedidosEmPreparo { get; set; }
+    public int PedidosProntos { get; set; }
+    public int PedidosEntregues { get; set; }
+    public int PedidosCancelados { get; set; }
+    public int TotalClientes { get; set; }
+    public int TotalProdutos { get; set; }
 }

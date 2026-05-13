@@ -9,17 +9,17 @@
     body { background: #f8f5f0; }
     .navbar { background: #02585a !important; }
     .navbar-brand { color: #eed3b9 !important; font-weight: 700; }
-    .nav-link { color: #eed3b9 !important; }
+    .nav-link { color: #eed3b9 !important; cursor: pointer; }
     .nav-link.active { color: #fff !important; border-bottom: 2px solid #eed3b9; }
     .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
     .btn-primary { background: #02585a; border-color: #02585a; }
     .btn-primary:hover { background: #014040; border-color: #014040; }
     .badge-status { padding: 4px 10px; border-radius: 20px; font-size: .75rem; display: inline-block; }
-    .status-aberto     { background: #ffeeba; color: #856404; }
-    .status-empreparo  { background: #b8daff; color: #004085; }
-    .status-pronto     { background: #c3e6cb; color: #155724; }
-    .status-entregue   { background: #d4edda; color: #155724; }
-    .status-cancelado  { background: #f5c6cb; color: #721c24; }
+    .status-aberto    { background: #ffeeba; color: #856404; }
+    .status-empreparo { background: #b8daff; color: #004085; }
+    .status-pronto    { background: #c3e6cb; color: #155724; }
+    .status-entregue  { background: #d4edda; color: #155724; }
+    .status-cancelado { background: #f5c6cb; color: #721c24; }
     #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; width: 320px; }
     .section { display: none; }
     .section.active { display: block; }
@@ -31,7 +31,7 @@
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card card p-4">
     <h4 class="text-center mb-1" style="color:#02585a">☕ Gato do Luar</h4>
@@ -49,15 +49,17 @@
   </div>
 </div>
 
-<!-- TELA PRINCIPAL -->
+<!-- APP -->
 <div id="app-screen">
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <span class="navbar-brand">☕ Gato do Luar</span>
       <div class="d-flex gap-3 align-items-center">
-        <a class="nav-link active" href="#" onclick="mostrarSecao('produtos', event)">Produtos</a>
-        <a class="nav-link" href="#" onclick="mostrarSecao('pedidos', event)">Pedidos</a>
-        <span class="nav-link text-light small" id="usuario-nome"></span>
+        <a class="nav-link active" onclick="mostrarSecao('dashboard', this)">Início</a>
+        <a class="nav-link" onclick="mostrarSecao('produtos', this)">Produtos</a>
+        <a class="nav-link" onclick="mostrarSecao('clientes', this)">Clientes</a>
+        <a class="nav-link" onclick="mostrarSecao('pedidos', this)">Pedidos</a>
+        <span class="text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
       </div>
     </div>
@@ -65,8 +67,53 @@
 
   <div class="container py-4">
 
-    <!-- SEÇÃO PRODUTOS -->
-    <div class="section active" id="sec-produtos">
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <h5 class="mb-4">Resumo do Dia</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:2rem">📋</div>
+            <div class="fw-bold fs-4" id="dash-total">—</div>
+            <div class="text-muted small">Pedidos hoje</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:2rem">💰</div>
+            <div class="fw-bold fs-4" id="dash-faturamento">—</div>
+            <div class="text-muted small">Faturamento</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:2rem">👥</div>
+            <div class="fw-bold fs-4" id="dash-clientes">—</div>
+            <div class="text-muted small">Clientes ativos</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:2rem">☕</div>
+            <div class="fw-bold fs-4" id="dash-produtos">—</div>
+            <div class="text-muted small">Produtos ativos</div>
+          </div>
+        </div>
+      </div>
+      <div class="card p-3">
+        <h6 class="mb-3">Status dos pedidos de hoje</h6>
+        <div class="row text-center g-2">
+          <div class="col"><span class="badge-status status-aberto d-block py-2">Abertos<br><strong id="dash-abertos">—</strong></span></div>
+          <div class="col"><span class="badge-status status-empreparo d-block py-2">Em Preparo<br><strong id="dash-empreparo">—</strong></span></div>
+          <div class="col"><span class="badge-status status-pronto d-block py-2">Prontos<br><strong id="dash-prontos">—</strong></span></div>
+          <div class="col"><span class="badge-status status-entregue d-block py-2">Entregues<br><strong id="dash-entregues">—</strong></span></div>
+          <div class="col"><span class="badge-status status-cancelado d-block py-2">Cancelados<br><strong id="dash-cancelados">—</strong></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div class="section" id="sec-produtos">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Cardápio</h5>
         <button class="btn btn-primary btn-sm" onclick="abrirModalProduto()">+ Novo Produto</button>
@@ -77,19 +124,45 @@
             <thead class="table-light">
               <tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr>
             </thead>
-            <tbody id="tbody-produtos">
-              <tr><td colspan="6" class="text-center text-muted py-3">Carregando...</td></tr>
-            </tbody>
+            <tbody id="tbody-produtos"><tr><td colspan="6" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- SEÇÃO PEDIDOS -->
+    <!-- CLIENTES -->
+    <div class="section" id="sec-clientes">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Clientes</h5>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalCliente()">+ Novo Cliente</button>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th><th>Cadastro</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="tbody-clientes"><tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
     <div class="section" id="sec-pedidos">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Pedidos</h5>
         <button class="btn btn-primary btn-sm" onclick="abrirModalPedido()">+ Novo Pedido</button>
+      </div>
+      <div class="mb-3">
+        <select id="filtro-status" class="form-select w-auto" onchange="carregarPedidos()">
+          <option value="">Todos os status</option>
+          <option value="Aberto">Abertos</option>
+          <option value="EmPreparo">Em Preparo</option>
+          <option value="Pronto">Prontos</option>
+          <option value="Entregue">Entregues</option>
+          <option value="Cancelado">Cancelados</option>
+        </select>
       </div>
       <div class="card">
         <div class="card-body p-0">
@@ -97,9 +170,7 @@
             <thead class="table-light">
               <tr><th>#</th><th>Cliente</th><th>Atendente</th><th>Data</th><th>Total</th><th>Status</th><th></th></tr>
             </thead>
-            <tbody id="tbody-pedidos">
-              <tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr>
-            </tbody>
+            <tbody id="tbody-pedidos"><tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -118,29 +189,14 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="produto-id">
-        <div class="mb-2">
-          <label class="form-label">Nome</label>
-          <input type="text" id="produto-nome" class="form-control">
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Descrição</label>
-          <input type="text" id="produto-descricao" class="form-control">
+        <div class="mb-2"><label class="form-label">Nome</label><input type="text" id="produto-nome" class="form-control"></div>
+        <div class="mb-2"><label class="form-label">Descrição</label><input type="text" id="produto-descricao" class="form-control"></div>
+        <div class="row">
+          <div class="col mb-2"><label class="form-label">Preço (R$)</label><input type="number" id="produto-preco" class="form-control" step="0.01"></div>
+          <div class="col mb-2"><label class="form-label">Custo (R$)</label><input type="number" id="produto-custo" class="form-control" step="0.01"></div>
         </div>
         <div class="row">
-          <div class="col mb-2">
-            <label class="form-label">Preço (R$)</label>
-            <input type="number" id="produto-preco" class="form-control" step="0.01">
-          </div>
-          <div class="col mb-2">
-            <label class="form-label">Custo (R$)</label>
-            <input type="number" id="produto-custo" class="form-control" step="0.01">
-          </div>
-        </div>
-        <div class="row">
-          <div class="col mb-2">
-            <label class="form-label">Estoque</label>
-            <input type="number" id="produto-estoque" class="form-control">
-          </div>
+          <div class="col mb-2"><label class="form-label">Estoque</label><input type="number" id="produto-estoque" class="form-control"></div>
           <div class="col mb-2">
             <label class="form-label">Categoria</label>
             <select id="produto-categoria" class="form-select">
@@ -160,6 +216,31 @@
   </div>
 </div>
 
+<!-- MODAL CLIENTE -->
+<div class="modal fade" id="modal-cliente" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-cliente-titulo">Novo Cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cliente-id">
+        <div class="mb-2"><label class="form-label">Nome *</label><input type="text" id="cliente-nome" class="form-control"></div>
+        <div class="mb-2"><label class="form-label">E-mail *</label><input type="email" id="cliente-email" class="form-control"></div>
+        <div class="row">
+          <div class="col mb-2"><label class="form-label">Telefone</label><input type="text" id="cliente-telefone" class="form-control" placeholder="(71) 99999-0000"></div>
+          <div class="col mb-2"><label class="form-label">CPF</label><input type="text" id="cliente-cpf" class="form-control" placeholder="000.000.000-00"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL PEDIDO -->
 <div class="modal fade" id="modal-pedido" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -172,26 +253,20 @@
         <div class="row mb-3">
           <div class="col">
             <label class="form-label">Cliente (opcional)</label>
-            <select id="pedido-cliente" class="form-select">
-              <option value="">Avulso (sem cadastro)</option>
-            </select>
+            <select id="pedido-cliente" class="form-select"><option value="">Avulso</option></select>
           </div>
           <div class="col">
             <label class="form-label">Observações</label>
             <input type="text" id="pedido-obs" class="form-control" placeholder="Ex: sem açúcar">
           </div>
         </div>
-
         <hr>
         <div class="d-flex justify-content-between align-items-center mb-2">
           <strong>Itens do pedido</strong>
           <button class="btn btn-sm btn-outline-primary" onclick="adicionarItem()">+ Adicionar item</button>
         </div>
         <div id="lista-itens"></div>
-
-        <div class="mt-3 text-end">
-          <strong>Total: R$ <span id="total-pedido">0,00</span></strong>
-        </div>
+        <div class="mt-3 text-end"><strong>Total: R$ <span id="total-pedido">0,00</span></strong></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -210,34 +285,31 @@ const API = '';
 let token = localStorage.getItem('cafeteria_token');
 let usuario = JSON.parse(localStorage.getItem('cafeteria_user') || 'null');
 let produtosDisponiveis = [];
+let clientesDisponiveis = [];
 let itensPedido = [];
 
-// ── AUTENTICAÇÃO ──────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────────
 async function fazerLogin() {
   const email = document.getElementById('login-email').value;
   const senha = document.getElementById('login-senha').value;
   document.getElementById('login-erro').textContent = '';
   try {
-    const res = await fetch(`${API}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha })
     });
     const data = await res.json();
     if (!data.sucesso) throw new Error(data.mensagem);
     token = data.dados.token;
-    usuario = { nome: data.dados.nome, cargo: data.dados.cargo, id: 1 };
+    usuario = { nome: data.dados.nome, cargo: data.dados.cargo };
     localStorage.setItem('cafeteria_token', token);
     localStorage.setItem('cafeteria_user', JSON.stringify(usuario));
     iniciarApp();
-  } catch (e) {
-    document.getElementById('login-erro').textContent = e.message;
-  }
+  } catch (e) { document.getElementById('login-erro').textContent = e.message; }
 }
 
 function sair() {
-  localStorage.removeItem('cafeteria_token');
-  localStorage.removeItem('cafeteria_user');
+  localStorage.clear();
   token = null;
   document.getElementById('app-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -247,32 +319,47 @@ function iniciarApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   document.getElementById('usuario-nome').textContent = `${usuario.nome} (${usuario.cargo})`;
-  carregarProdutos();
+  carregarDashboard();
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────
-function mostrarSecao(sec, event) {
-  if (event) event.preventDefault();
+function mostrarSecao(sec, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + sec).classList.add('active');
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  if (event) event.target.classList.add('active');
+  if (el) el.classList.add('active');
+  if (sec === 'dashboard') carregarDashboard();
+  if (sec === 'produtos') carregarProdutos();
+  if (sec === 'clientes') carregarClientes();
   if (sec === 'pedidos') carregarPedidos();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+async function carregarDashboard() {
+  try {
+    const res = await fetch('/api/dashboard', { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const d = data.dados;
+    document.getElementById('dash-total').textContent = d.totalPedidosHoje;
+    document.getElementById('dash-faturamento').textContent = `R$ ${d.faturamentoHoje.toFixed(2).replace('.',',')}`;
+    document.getElementById('dash-clientes').textContent = d.totalClientes;
+    document.getElementById('dash-produtos').textContent = d.totalProdutos;
+    document.getElementById('dash-abertos').textContent = d.pedidosAbertos;
+    document.getElementById('dash-empreparo').textContent = d.pedidosEmPreparo;
+    document.getElementById('dash-prontos').textContent = d.pedidosProntos;
+    document.getElementById('dash-entregues').textContent = d.pedidosEntregues;
+    document.getElementById('dash-cancelados').textContent = d.pedidosCancelados;
+  } catch(e) { mostrarToast('Erro ao carregar dashboard.', 'danger'); }
 }
 
 // ── PRODUTOS ──────────────────────────────────────────────
 async function carregarProdutos() {
   try {
-    const res = await fetch(`${API}/api/produtos?apenasAtivos=false`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const res = await fetch('/api/produtos?apenasAtivos=false', { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     produtosDisponiveis = (data.dados || []).filter(p => p.ativo);
     const tbody = document.getElementById('tbody-produtos');
-    if (!data.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum produto cadastrado.</td></tr>';
-      return;
-    }
+    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Nenhum produto cadastrado.</td></tr>'; return; }
     tbody.innerHTML = data.dados.map(p => `
       <tr>
         <td><strong>${p.nome}</strong><br><small class="text-muted">${p.descricao || ''}</small></td>
@@ -291,13 +378,12 @@ async function carregarProdutos() {
 function abrirModalProduto() {
   document.getElementById('produto-id').value = '';
   document.getElementById('modal-produto-titulo').textContent = 'Novo Produto';
-  ['nome','descricao','preco','custo','estoque'].forEach(f =>
-    document.getElementById('produto-' + f).value = '');
+  ['nome','descricao','preco','custo','estoque'].forEach(f => document.getElementById('produto-' + f).value = '');
   new bootstrap.Modal(document.getElementById('modal-produto')).show();
 }
 
 async function editarProduto(id) {
-  const res = await fetch(`${API}/api/produtos/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const res = await fetch(`/api/produtos/${id}`, { headers: { Authorization: `Bearer ${token}` } });
   const data = await res.json();
   const p = data.dados;
   document.getElementById('produto-id').value = p.idProduto;
@@ -320,10 +406,9 @@ async function salvarProduto() {
     idCategoria: parseInt(document.getElementById('produto-categoria').value),
     ativo: true
   };
-  const method = id ? 'PUT' : 'POST';
-  const url = id ? `${API}/api/produtos/${id}` : `${API}/api/produtos`;
-  const res = await fetch(url, {
-    method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  const res = await fetch(id ? `/api/produtos/${id}` : '/api/produtos', {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(body)
   });
   const data = await res.json();
@@ -334,34 +419,101 @@ async function salvarProduto() {
 
 async function deletarProduto(id) {
   if (!confirm('Desativar este produto?')) return;
-  const res = await fetch(`${API}/api/produtos/${id}`, {
-    method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
-  });
+  const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
   const data = await res.json();
   mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
   if (data.sucesso) carregarProdutos();
 }
 
+// ── CLIENTES ──────────────────────────────────────────────
+async function carregarClientes() {
+  try {
+    const res = await fetch('/api/clientes', { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    clientesDisponiveis = data.dados || [];
+    const tbody = document.getElementById('tbody-clientes');
+    if (!clientesDisponiveis.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum cliente cadastrado.</td></tr>'; return; }
+    tbody.innerHTML = clientesDisponiveis.map(c => `
+      <tr>
+        <td><strong>${c.nome}</strong></td>
+        <td>${c.email}</td>
+        <td>${c.telefone || '—'}</td>
+        <td>${c.cpf || '—'}</td>
+        <td>${c.dataCadastro}</td>
+        <td><span class="badge ${c.ativo ? 'bg-success' : 'bg-secondary'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editarCliente(${c.idCliente})">Editar</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deletarCliente(${c.idCliente})">Desativar</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) { mostrarToast('Erro ao carregar clientes.', 'danger'); }
+}
+
+function abrirModalCliente() {
+  document.getElementById('cliente-id').value = '';
+  document.getElementById('modal-cliente-titulo').textContent = 'Novo Cliente';
+  ['nome','email','telefone','cpf'].forEach(f => document.getElementById('cliente-' + f).value = '');
+  new bootstrap.Modal(document.getElementById('modal-cliente')).show();
+}
+
+async function editarCliente(id) {
+  const res = await fetch(`/api/clientes/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+  const c = data.dados;
+  document.getElementById('cliente-id').value = c.idCliente;
+  document.getElementById('cliente-nome').value = c.nome;
+  document.getElementById('cliente-email').value = c.email;
+  document.getElementById('cliente-telefone').value = c.telefone || '';
+  document.getElementById('cliente-cpf').value = c.cpf || '';
+  document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
+  new bootstrap.Modal(document.getElementById('modal-cliente')).show();
+}
+
+async function salvarCliente() {
+  const id = document.getElementById('cliente-id').value;
+  const body = {
+    nome: document.getElementById('cliente-nome').value,
+    email: document.getElementById('cliente-email').value,
+    telefone: document.getElementById('cliente-telefone').value || null,
+    cpf: document.getElementById('cliente-cpf').value || null
+  };
+  const res = await fetch(id ? `/api/clientes/${id}` : '/api/clientes', {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  bootstrap.Modal.getInstance(document.getElementById('modal-cliente')).hide();
+  mostrarToast(data.mensagem || 'Salvo!', data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarClientes();
+}
+
+async function deletarCliente(id) {
+  if (!confirm('Desativar este cliente?')) return;
+  const res = await fetch(`/api/clientes/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+  mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
+  if (data.sucesso) carregarClientes();
+}
+
 // ── PEDIDOS ───────────────────────────────────────────────
 async function carregarPedidos() {
   try {
-    const res = await fetch(`${API}/api/pedidos`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch('/api/pedidos', { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
+    const filtro = document.getElementById('filtro-status').value;
+    const pedidos = (data.dados || []).filter(p => !filtro || p.status === filtro);
     const tbody = document.getElementById('tbody-pedidos');
-    if (!data.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum pedido encontrado.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = data.dados.map(p => {
-      const statusClass = p.status.toLowerCase().replace('empreparo','empreparo');
-      return `
-      <tr>
+    if (!pedidos.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum pedido encontrado.</td></tr>'; return; }
+    tbody.innerHTML = pedidos.map(p => {
+      const sc = p.status.toLowerCase().replace(' ','');
+      return `<tr>
         <td>#${p.idPedido}</td>
         <td>${p.cliente || 'Avulso'}</td>
         <td>${p.atendente}</td>
         <td>${new Date(p.dataPedido).toLocaleString('pt-BR')}</td>
         <td>R$ ${p.valorTotal.toFixed(2)}</td>
-        <td><span class="badge-status status-${statusClass}">${p.status}</span></td>
+        <td><span class="badge-status status-${sc}">${p.status}</span></td>
         <td>
           ${p.status !== 'Cancelado' && p.status !== 'Entregue' ? `
             <select class="form-select form-select-sm d-inline w-auto me-1" onchange="atualizarStatus(${p.idPedido}, this.value)">
@@ -382,21 +534,11 @@ async function abrirModalPedido() {
   document.getElementById('pedido-obs').value = '';
   document.getElementById('lista-itens').innerHTML = '';
   document.getElementById('total-pedido').textContent = '0,00';
-
-  // Carregar clientes
-  try {
-    const res = await fetch(`${API}/api/pedidos`, { headers: { Authorization: `Bearer ${token}` } });
-  } catch(e) {}
-
-  // Popular select de produtos
   await carregarProdutos();
-
-  // Select de clientes — fixo por enquanto
-  document.getElementById('pedido-cliente').innerHTML = `
-    <option value="">Avulso (sem cadastro)</option>
-    <option value="1">Maria Silva</option>
-  `;
-
+  await carregarClientes();
+  const sel = document.getElementById('pedido-cliente');
+  sel.innerHTML = '<option value="">Avulso (sem cadastro)</option>' +
+    clientesDisponiveis.filter(c => c.ativo).map(c => `<option value="${c.idCliente}">${c.nome}</option>`).join('');
   adicionarItem();
   new bootstrap.Modal(document.getElementById('modal-pedido')).show();
 }
@@ -404,29 +546,25 @@ async function abrirModalPedido() {
 function adicionarItem() {
   const idx = itensPedido.length;
   itensPedido.push({ idProduto: '', quantidade: 1, observacao: '' });
-
   const opcoes = produtosDisponiveis.map(p =>
-    `<option value="${p.idProduto}" data-preco="${p.preco}">${p.nome} — R$ ${p.preco.toFixed(2)}</option>`
-  ).join('');
-
+    `<option value="${p.idProduto}">${p.nome} — R$ ${p.preco.toFixed(2)}</option>`).join('');
   const div = document.createElement('div');
   div.className = 'item-pedido';
   div.id = `item-${idx}`;
   div.innerHTML = `
     <div class="row align-items-center">
       <div class="col-5">
-        <select class="form-select form-select-sm" onchange="atualizarItem(${idx}, 'idProduto', this.value)">
-          <option value="">Selecione um produto</option>
-          ${opcoes}
+        <select class="form-select form-select-sm" onchange="atualizarItem(${idx},'idProduto',this.value)">
+          <option value="">Selecione um produto</option>${opcoes}
         </select>
       </div>
       <div class="col-2">
         <input type="number" class="form-control form-control-sm" value="1" min="1"
-          onchange="atualizarItem(${idx}, 'quantidade', parseInt(this.value))">
+          onchange="atualizarItem(${idx},'quantidade',parseInt(this.value))">
       </div>
       <div class="col-4">
         <input type="text" class="form-control form-control-sm" placeholder="Observação"
-          onchange="atualizarItem(${idx}, 'observacao', this.value)">
+          onchange="atualizarItem(${idx},'observacao',this.value)">
       </div>
       <div class="col-1 text-end">
         <button class="btn btn-sm btn-outline-danger" onclick="removerItem(${idx})">✕</button>
@@ -435,75 +573,53 @@ function adicionarItem() {
   document.getElementById('lista-itens').appendChild(div);
 }
 
-function atualizarItem(idx, campo, valor) {
-  itensPedido[idx][campo] = valor;
-  calcularTotal();
-}
-
-function removerItem(idx) {
-  document.getElementById(`item-${idx}`)?.remove();
-  itensPedido[idx] = null;
-  calcularTotal();
-}
+function atualizarItem(idx, campo, valor) { itensPedido[idx][campo] = valor; calcularTotal(); }
+function removerItem(idx) { document.getElementById(`item-${idx}`)?.remove(); itensPedido[idx] = null; calcularTotal(); }
 
 function calcularTotal() {
   let total = 0;
-  itensPedido.forEach((item, idx) => {
-    if (!item || !item.idProduto) return;
-    const produto = produtosDisponiveis.find(p => p.idProduto == item.idProduto);
-    if (produto) total += produto.preco * (item.quantidade || 1);
+  itensPedido.forEach(item => {
+    if (!item?.idProduto) return;
+    const p = produtosDisponiveis.find(p => p.idProduto == item.idProduto);
+    if (p) total += p.preco * (item.quantidade || 1);
   });
   document.getElementById('total-pedido').textContent = total.toFixed(2).replace('.', ',');
 }
 
 async function salvarPedido() {
-  const itensValidos = itensPedido.filter(i => i && i.idProduto);
-  if (!itensValidos.length) {
-    mostrarToast('Adicione pelo menos um produto ao pedido.', 'warning');
-    return;
-  }
-
+  const itensValidos = itensPedido.filter(i => i?.idProduto);
+  if (!itensValidos.length) { mostrarToast('Adicione pelo menos um produto.', 'warning'); return; }
   const clienteVal = document.getElementById('pedido-cliente').value;
   const body = {
     idCliente: clienteVal ? parseInt(clienteVal) : null,
     idFuncionario: 1,
     observacoes: document.getElementById('pedido-obs').value,
-    itens: itensValidos.map(i => ({
-      idProduto: parseInt(i.idProduto),
-      quantidade: i.quantidade || 1,
-      observacao: i.observacao || ''
-    }))
+    itens: itensValidos.map(i => ({ idProduto: parseInt(i.idProduto), quantidade: i.quantidade || 1, observacao: i.observacao || '' }))
   };
-
-  const res = await fetch(`${API}/api/pedidos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  const res = await fetch('/api/pedidos', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(body)
   });
   const data = await res.json();
   bootstrap.Modal.getInstance(document.getElementById('modal-pedido')).hide();
   mostrarToast(data.mensagem || (data.sucesso ? 'Pedido aberto!' : 'Erro'), data.sucesso ? 'success' : 'danger');
-  if (data.sucesso) carregarPedidos();
+  if (data.sucesso) { carregarPedidos(); carregarDashboard(); }
 }
 
 async function atualizarStatus(id, status) {
   if (!status) return;
-  const res = await fetch(`${API}/api/pedidos/${id}/status?status=${status}`, {
-    method: 'PUT', headers: { Authorization: `Bearer ${token}` }
-  });
+  const res = await fetch(`/api/pedidos/${id}/status?status=${status}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } });
   const data = await res.json();
   mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
-  if (data.sucesso) carregarPedidos();
+  if (data.sucesso) { carregarPedidos(); carregarDashboard(); }
 }
 
 async function cancelarPedido(id) {
   if (!confirm(`Cancelar pedido #${id}?`)) return;
-  const res = await fetch(`${API}/api/pedidos/${id}`, {
-    method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
-  });
+  const res = await fetch(`/api/pedidos/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
   const data = await res.json();
   mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
-  if (data.sucesso) carregarPedidos();
+  if (data.sucesso) { carregarPedidos(); carregarDashboard(); }
 }
 
 // ── TOAST ─────────────────────────────────────────────────
@@ -515,7 +631,6 @@ function mostrarToast(msg, tipo = 'success') {
   setTimeout(() => el.remove(), 4000);
 }
 
-// ── INICIALIZAÇÃO ─────────────────────────────────────────
 if (token && usuario) iniciarApp();
 </script>
 </body>
