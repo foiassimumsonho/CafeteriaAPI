@@ -27,6 +27,7 @@ builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+builder.Services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
 
 // Services
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IPagamentoService, PagamentoService>();
+builder.Services.AddScoped<IFuncionarioService, FuncionarioService>();
 
 // ── AUTENTICAÇÃO JWT ───────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
