@@ -45,7 +45,7 @@ namespace CafeteriaAPI.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Telefone = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Cpf = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Cpf = table.Column<string>(type: "varchar(95)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DataCadastro = table.Column<DateOnly>(type: "date", nullable: false),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -69,7 +69,7 @@ namespace CafeteriaAPI.Migrations
                     Salario = table.Column<decimal>(type: "decimal(8,2)", nullable: false),
                     DataAdmissao = table.Column<DateOnly>(type: "date", nullable: false),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Email = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Email = table.Column<string>(type: "varchar(95)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SenhaHash = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
@@ -116,7 +116,7 @@ namespace CafeteriaAPI.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IdCliente = table.Column<int>(type: "int", nullable: true),
                     IdFuncionario = table.Column<int>(type: "int", nullable: false),
-                    DataPedido = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DataPedido = table.Column<DateTime>(type: "datetime", nullable: false),
                     Status = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Observacoes = table.Column<string>(type: "longtext", nullable: true)
@@ -181,7 +181,7 @@ namespace CafeteriaAPI.Migrations
                     FormaPagamento = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ValorPago = table.Column<decimal>(type: "decimal(8,2)", nullable: false),
-                    DataPagamento = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    DataPagamento = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {

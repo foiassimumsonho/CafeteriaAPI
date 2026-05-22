@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CafeteriaAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260509033122_InitialCreate")]
+    [Migration("20260522001929_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -57,7 +57,7 @@ namespace CafeteriaAPI.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Cpf")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(95)");
 
                     b.Property<DateOnly>("DataCadastro")
                         .HasColumnType("date");
@@ -103,7 +103,7 @@ namespace CafeteriaAPI.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Email")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(95)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -161,7 +161,7 @@ namespace CafeteriaAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataPagamento")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("FormaPagamento")
                         .IsRequired()
@@ -188,7 +188,7 @@ namespace CafeteriaAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataPedido")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<int?>("IdCliente")
                         .HasColumnType("int");

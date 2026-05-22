@@ -3,8 +3,6 @@ using CafeteriaAPI.Models;
 
 namespace CafeteriaAPI.Data;
 
-// AppDbContext é a "ponte" entre o C# e o banco de dados.
-// Cada DbSet<T> corresponde a uma tabela.
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Categoria>   Categorias   => Set<Categoria>();
@@ -57,7 +55,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("funcionarios");
             e.HasKey(f => f.IdFuncionario);
             e.Property(f => f.Nome).IsRequired().HasMaxLength(100);
-            e.Property(f => f.Cargo).HasConversion<string>(); // salva como texto no banco
+            e.Property(f => f.Cargo).HasConversion<string>();
             e.Property(f => f.Salario).HasColumnType("decimal(8,2)");
             e.HasIndex(f => f.Email).IsUnique();
         });
@@ -68,6 +66,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("pedidos");
             e.HasKey(p => p.IdPedido);
             e.Property(p => p.Status).HasConversion<string>();
+            // MySQL 5.5 não suporta datetime(6) — usa datetime simples
+            e.Property(p => p.DataPedido).HasColumnType("datetime");
             e.HasOne(p => p.Cliente)
              .WithMany(c => c.Pedidos)
              .HasForeignKey(p => p.IdCliente)
@@ -84,7 +84,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("itens_pedido");
             e.HasKey(i => i.IdItem);
             e.Property(i => i.PrecoUnitario).HasColumnType("decimal(8,2)");
-            e.Ignore(i => i.Subtotal); // não persiste no banco
+            e.Ignore(i => i.Subtotal);
             e.HasOne(i => i.Pedido)
              .WithMany(p => p.Itens)
              .HasForeignKey(i => i.IdPedido)
@@ -102,6 +102,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasKey(p => p.IdPagamento);
             e.Property(p => p.FormaPagamento).HasConversion<string>();
             e.Property(p => p.ValorPago).HasColumnType("decimal(8,2)");
+            // MySQL 5.5 não suporta datetime(6)
+            e.Property(p => p.DataPagamento).HasColumnType("datetime");
             e.HasOne(p => p.Pedido)
              .WithOne(pe => pe.Pagamento)
              .HasForeignKey<Pagamento>(p => p.IdPedido)
