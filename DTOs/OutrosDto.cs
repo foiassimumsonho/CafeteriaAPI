@@ -281,3 +281,24 @@ public class FuncionarioResponseDto
     public string DataAdmissao { get; set; } = string.Empty;
     public bool Ativo { get; set; }
 }
+
+// ── RELATÓRIO ──────────────────────────────────────────────
+public class ProdutoRelatorioDto
+{
+    public string Produto { get; set; } = string.Empty;
+    public int Quantidade { get; set; }
+    public decimal TotalVendido { get; set; }
+}
+
+public class RelatorioDto
+{
+    public int Ano { get; set; }
+    public int Mes { get; set; }
+    public string NomeMes { get; set; } = string.Empty;
+    public int TotalPedidos { get; set; }
+    public int PedidosCancelados { get; set; }
+    public int PedidosEntregues { get; set; }
+    public decimal FaturamentoBruto { get; set; }
+    public decimal TotalRecebido { get; set; }
+    public IEnumerable<ProdutoRelatorioDto> ProdutosMaisVendidos { get; set; } = [];
+}

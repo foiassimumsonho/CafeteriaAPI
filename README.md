@@ -1,47 +1,33 @@
 # Cafeteria Gato do Luar – API REST
 
-> Desafio Sprint 03 – Desenvolvimento de APIs e Serviços Web  
+> Projeto desenvolvido ao longo dos Sprints 02, 03 e 04 do curso de Desenvolvimento Backend.
 > Estudante: Amanda
 
 ---
 
-## Arquitetura
+## 🌐 Acesso em Produção
 
-O projeto segue a arquitetura em camadas (Layered Architecture):
+**Interface Web:** https://cafeteriaapi-m4xx.onrender.com  
+**Swagger (documentação da API):** https://cafeteriaapi-m4xx.onrender.com/swagger  
+**Banco de dados:** FreeSQLDatabase (MySQL 5.5 — nuvem)
 
-```
-Interface Web (Bootstrap + JS)
-         ↓ HTTP (JSON)
-    Controllers          ← recebe requisições, valida entrada, retorna respostas
-         ↓
-     Services            ← regras de negócio, validações de domínio
-         ↓
-   Repositories          ← acesso ao banco via Entity Framework Core
-         ↓
-      MySQL DB            ← banco cafeteria_db
-```
-
-### Estrutura de pastas
-
-```
-CafeteriaAPI/
-├── Controllers/          # Endpoints da API
-├── Models/               # Entidades do banco de dados
-├── DTOs/                 # Objetos de transferência (entrada/saída da API)
-├── Services/             # Regras de negócio
-│   └── Interfaces/
-├── Repositories/         # Acesso ao banco de dados
-│   └── Interfaces/
-├── Data/                 # AppDbContext (EF Core)
-├── Helpers/              # JwtHelper (geração de tokens)
-├── Middleware/           # Tratamento global de erros
-├── wwwroot/              # Interface web (HTML + Bootstrap)
-└── appsettings.json      # Configurações (conexão, JWT)
-```
+> ⚠️ O plano gratuito do Render hiberna após inatividade. Na primeira requisição pode demorar até 50 segundos para acordar.
 
 ---
 
-## Tecnologias
+## 📋 Descrição do Projeto
+
+Sistema web completo de gestão para a **Cafeteria Gato do Luar**, desenvolvido com ASP.NET Core 8 e MySQL. Permite o gerenciamento de produtos, clientes, funcionários, pedidos e pagamentos, com autenticação JWT e interface web responsiva.
+
+---
+
+## 🎯 Objetivo do Sistema
+
+Digitalizar e centralizar a operação da cafeteria, permitindo que funcionários registrem pedidos, controlem o estoque, gerenciem clientes e acompanhem o faturamento do dia em tempo real.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
 
 | Camada | Tecnologia |
 |---|---|
@@ -51,85 +37,182 @@ CafeteriaAPI/
 | Autenticação | JWT Bearer |
 | Documentação | Swagger / OpenAPI |
 | Frontend | HTML5 + Bootstrap 5 + Vanilla JS |
+| Deploy API | Render (Docker) |
+| Banco produção | FreeSQLDatabase.com |
+| Versionamento | Git + GitHub |
 
 ---
 
-## Como executar
+## 🏗️ Arquitetura
+
+```
+Interface Web (Bootstrap + JS)
+         ↓ HTTP (JSON)
+    Controllers          ← recebe requisições, retorna respostas JSON
+         ↓
+     Services            ← regras de negócio e validações
+         ↓
+   Repositories          ← acesso ao banco via Entity Framework Core
+         ↓
+      MySQL DB            ← banco sql10827819 (FreeSQLDatabase)
+```
+
+### Estrutura de Pastas
+
+```
+CafeteriaAPI/
+├── Controllers/          # Endpoints da API
+├── Models/               # Entidades do banco de dados
+├── DTOs/                 # Objetos de transferência
+├── Services/             # Regras de negócio
+│   └── Interfaces/
+├── Repositories/         # Acesso ao banco de dados
+│   └── Interfaces/
+├── Data/                 # AppDbContext (EF Core)
+├── Helpers/              # JwtHelper
+├── Middleware/           # Tratamento global de erros
+├── Migrations/           # Migrations do EF Core
+├── wwwroot/              # Interface web (HTML + Bootstrap)
+├── Dockerfile            # Configuração para deploy
+└── appsettings.json      # Configurações
+```
+
+---
+
+## ⚙️ Como Executar Localmente
 
 ### Pré-requisitos
 - .NET 8 SDK
 - MySQL rodando localmente
+- Git
 
 ### Passos
 
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/seu-usuario/CafeteriaAPI
+git clone https://github.com/foiassimumsonho/CafeteriaAPI
 
-# 2. Configurar a connection string
-# Edite appsettings.json e coloque sua senha do MySQL
+# 2. Entrar na pasta
+cd CafeteriaAPI
 
-# 3. Restaurar pacotes
+# 3. Configurar a connection string
+# Edite appsettings.json com sua senha do MySQL local
+
+# 4. Restaurar pacotes
 dotnet restore
 
-# 4. Aplicar migrations
+# 5. Aplicar migrations
 dotnet ef migrations add InitialCreate
 dotnet ef database update
 
-# 5. Rodar a API
+# 6. Rodar a API
 dotnet run
 
-# 6. Acessar o Swagger
-# http://localhost:5000/swagger
+# 7. Acessar
+# Interface: http://localhost:5000
+# Swagger:   http://localhost:5000/swagger
 ```
 
 ---
 
-## Endpoints principais
+## 🔐 Autenticação
+
+O sistema usa **JWT Bearer Token**. Para acessar endpoints protegidos:
+
+1. Faça login em `POST /api/Auth/login`
+2. Copie o token retornado
+3. No Swagger, clique em **Authorize** e cole: `Bearer {token}`
+
+**Credenciais de demonstração:**
+```
+Email: amanda@cafeteria.com
+Senha: cafeteria123
+```
+
+---
+
+## 📡 Endpoints da API
 
 ### Auth
 | Método | Rota | Descrição | Auth |
 |---|---|---|---|
-| POST | /api/auth/login | Login → retorna token JWT | ❌ |
-| POST | /api/auth/registrar | Registra funcionário | ✅ Gerente |
+| POST | /api/Auth/login | Login → retorna JWT | ❌ |
+| POST | /api/Auth/registrar | Registra funcionário | ✅ Gerente |
 
 ### Produtos
 | Método | Rota | Descrição | Auth |
 |---|---|---|---|
-| GET | /api/produtos | Lista produtos | ❌ |
-| GET | /api/produtos/{id} | Busca por ID | ❌ |
-| POST | /api/produtos | Cria produto | ✅ Gerente |
-| PUT | /api/produtos/{id} | Atualiza produto | ✅ Gerente |
-| DELETE | /api/produtos/{id} | Desativa produto | ✅ Gerente |
+| GET | /api/Produtos | Lista produtos | ❌ |
+| GET | /api/Produtos/{id} | Busca por ID | ❌ |
+| POST | /api/Produtos | Cria produto | ✅ Gerente |
+| PUT | /api/Produtos/{id} | Atualiza produto | ✅ Gerente |
+| DELETE | /api/Produtos/{id} | Desativa produto | ✅ Gerente |
+
+### Clientes
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | /api/Clientes | Lista clientes | ✅ |
+| GET | /api/Clientes/{id} | Busca por ID | ✅ |
+| POST | /api/Clientes | Cadastra cliente | ✅ |
+| PUT | /api/Clientes/{id} | Atualiza cliente | ✅ |
+| DELETE | /api/Clientes/{id} | Desativa cliente | ✅ |
+
+### Funcionários
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | /api/Funcionarios | Lista funcionários | ✅ |
+| GET | /api/Funcionarios/{id} | Busca por ID | ✅ |
+| POST | /api/Funcionarios | Cadastra funcionário | ✅ Gerente |
+| PUT | /api/Funcionarios/{id} | Atualiza funcionário | ✅ Gerente |
+| DELETE | /api/Funcionarios/{id} | Desativa funcionário | ✅ Gerente |
 
 ### Pedidos
 | Método | Rota | Descrição | Auth |
 |---|---|---|---|
-| GET | /api/pedidos | Lista pedidos | ✅ |
-| GET | /api/pedidos/{id} | Busca pedido com itens | ✅ |
-| POST | /api/pedidos | Abre pedido | ✅ |
-| PUT | /api/pedidos/{id}/status | Atualiza status | ✅ |
-| DELETE | /api/pedidos/{id} | Cancela pedido | ✅ |
+| GET | /api/Pedidos | Lista pedidos | ✅ |
+| GET | /api/Pedidos/{id} | Busca pedido com itens | ✅ |
+| POST | /api/Pedidos | Abre pedido | ✅ |
+| PUT | /api/Pedidos/{id}/status | Atualiza status | ✅ |
+| DELETE | /api/Pedidos/{id} | Cancela pedido | ✅ |
+
+### Pagamentos
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | /api/Pagamentos | Lista pagamentos | ✅ |
+| POST | /api/Pagamentos | Registra pagamento | ✅ |
+
+### Dashboard
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | /api/Dashboard | Resumo do dia | ✅ |
 
 ---
 
-## Segurança
+## 📐 Regras de Negócio
 
-- Autenticação via **JWT Bearer Token**
-- Expiração configurável (padrão: 8h)
-- Autorização por **role (cargo)**: gerentes têm acesso a rotas administrativas
-- Senhas armazenadas com **BCrypt hash**
+- Apenas funcionários com cargo **Gerente** podem criar/editar/desativar produtos e funcionários
+- Ao criar um pedido, o estoque dos produtos é reduzido automaticamente
+- Ao cancelar um pedido, o estoque é devolvido automaticamente
+- Um pedido não pode ser alterado após ser cancelado
+- Cada pedido só pode ter um pagamento registrado
+- Senhas são armazenadas com hash **BCrypt**
+- Tokens JWT expiram em 8 horas
 
 ---
 
-## Padrão de resposta
+## 🖥️ Funcionalidades da Interface Web
 
-Todos os endpoints retornam o mesmo formato:
+- **Dashboard** — resumo do dia (pedidos, faturamento, status)
+- **Produtos** — listagem, cadastro, edição e desativação
+- **Clientes** — listagem, cadastro, edição e desativação
+- **Pedidos** — abertura de pedidos com múltiplos itens, atualização de status e cancelamento
+- **Pagamentos** — registro de pagamentos com forma (Dinheiro, Crédito, Débito, Pix)
+- **Funcionários** — listagem, cadastro e edição (apenas Gerentes)
 
-```json
-{
-  "sucesso": true,
-  "mensagem": "Produto criado com sucesso.",
-  "dados": { ... }
-}
-```
+---
+
+## 🔗 Links
+
+- **Repositório:** https://github.com/foiassimumsonho/CafeteriaAPI
+- **Sistema online:** https://cafeteriaapi-m4xx.onrender.com
+- **Swagger:** https://cafeteriaapi-m4xx.onrender.com/swagger

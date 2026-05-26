@@ -61,7 +61,10 @@
         <a class="nav-link" onclick="mostrarSecao('pedidos', this)">Pedidos</a>
         <a class="nav-link" onclick="mostrarSecao('pagamentos', this)">Pagamentos</a>
         <a class="nav-link" onclick="mostrarSecao('funcionarios', this)">Funcionários</a>
-              <span class="text-light small" id="usuario-nome"></span>
+        <a class="nav-link" onclick="mostrarSecao('relatorio', this)">Relatório</a>
+        <a class="nav-link" onclick="mostrarSecao('funcionarios', this)">Funcionários</a>
+        <a class="nav-link" onclick="mostrarSecao('relatorio', this)">Relatório</a>
+        <span class="text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
       </div>
     </div>
@@ -197,6 +200,7 @@
       </div>
     </div>
 
+
     <!-- FUNCIONÁRIOS -->
     <div class="section" id="sec-funcionarios">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -213,6 +217,50 @@
           </table>
         </div>
       </div>
+    </div>
+
+
+    <!-- FUNCIONÁRIOS -->
+    <div class="section" id="sec-funcionarios">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Funcionários</h5>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalFuncionario()">+ Novo Funcionário</button>
+      </div>
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr><th>Nome</th><th>E-mail</th><th>Cargo</th><th>Salário</th><th>Admissão</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="tbody-funcionarios"><tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- RELATÓRIO -->
+    <div class="section" id="sec-relatorio">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Relatório Financeiro</h5>
+        <div class="d-flex gap-2">
+          <select id="rel-mes" class="form-select form-select-sm" style="width:140px">
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+            <option value="3">Março</option><option value="4">Abril</option>
+            <option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option>
+            <option value="9">Setembro</option><option value="10">Outubro</option>
+            <option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+          <select id="rel-ano" class="form-select form-select-sm" style="width:100px">
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="carregarRelatorio()">Buscar</button>
+        </div>
+      </div>
+      <div id="rel-conteudo" class="text-muted text-center py-4">Selecione o mês e clique em Buscar.</div>
     </div>
 
   </div>
@@ -494,7 +542,9 @@ function mostrarSecao(sec, el) {
   if (sec === 'pedidos') carregarPedidos();
   if (sec === 'pagamentos') carregarPagamentos();
   if (sec === 'funcionarios') carregarFuncionarios();
+  if (sec === 'relatorio') { const d = new Date(); document.getElementById('rel-mes').value = d.getMonth()+1; document.getElementById('rel-ano').value = d.getFullYear(); carregarRelatorio(); }
   if (sec === 'funcionarios') carregarFuncionarios();
+  if (sec === 'relatorio') { const d = new Date(); document.getElementById('rel-mes').value = d.getMonth()+1; document.getElementById('rel-ano').value = d.getFullYear(); carregarRelatorio(); }
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────
@@ -787,6 +837,68 @@ async function cancelarPedido(id) {
 
 
 
+
+// ── RELATÓRIO ─────────────────────────────────────────────
+async function carregarRelatorio() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const div = document.getElementById('rel-conteudo');
+  div.innerHTML = '<div class="text-center py-4">Carregando...</div>';
+  try {
+    const res = await fetch(`/api/relatorio?ano=${ano}&mes=${mes}`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const d = data.dados;
+    div.innerHTML = `
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">📋</div>
+            <div class="fw-bold fs-4">${d.totalPedidos}</div>
+            <div class="text-muted small">Total de pedidos</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">✅</div>
+            <div class="fw-bold fs-4">${d.pedidosEntregues}</div>
+            <div class="text-muted small">Entregues</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">❌</div>
+            <div class="fw-bold fs-4">${d.pedidosCancelados}</div>
+            <div class="text-muted small">Cancelados</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">💰</div>
+            <div class="fw-bold fs-4">R$ ${d.faturamentoBruto.toFixed(2).replace(".",",")}</div>
+            <div class="text-muted small">Faturamento bruto</div>
+          </div>
+        </div>
+      </div>
+      <div class="card p-3">
+        <h6 class="mb-3">🏆 Produtos mais vendidos — ${d.nomeMes} ${d.ano}</h6>
+        ${d.produtosMaisVendidos.length ? `
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr><th>Produto</th><th class="text-center">Qtd</th><th class="text-end">Total</th></tr>
+          </thead>
+          <tbody>
+            ${d.produtosMaisVendidos.map(p => `
+              <tr>
+                <td>${p.produto}</td>
+                <td class="text-center">${p.quantidade}</td>
+                <td class="text-end">R$ ${p.totalVendido.toFixed(2).replace(".",",")}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>` : "<p class=\"text-muted text-center mb-0\">Nenhum produto vendido neste período.</p>"}
+      </div>`;
+  } catch(e) { div.innerHTML = '<div class="text-danger text-center py-4">Erro ao carregar relatório.</div>'; }
+}
+
 // ── FUNCIONÁRIOS ──────────────────────────────────────────
 async function carregarFuncionarios() {
   try {
@@ -878,6 +990,68 @@ async function deletarFuncionario(id) {
   if (data.sucesso) carregarFuncionarios();
 }
 
+
+
+// ── RELATÓRIO ─────────────────────────────────────────────
+async function carregarRelatorio() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const div = document.getElementById('rel-conteudo');
+  div.innerHTML = '<div class="text-center py-4">Carregando...</div>';
+  try {
+    const res = await fetch(`/api/relatorio?ano=${ano}&mes=${mes}`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const d = data.dados;
+    div.innerHTML = `
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">📋</div>
+            <div class="fw-bold fs-4">${d.totalPedidos}</div>
+            <div class="text-muted small">Total de pedidos</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">✅</div>
+            <div class="fw-bold fs-4">${d.pedidosEntregues}</div>
+            <div class="text-muted small">Entregues</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">❌</div>
+            <div class="fw-bold fs-4">${d.pedidosCancelados}</div>
+            <div class="text-muted small">Cancelados</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center">
+            <div style="font-size:1.8rem">💰</div>
+            <div class="fw-bold fs-4">R$ ${d.faturamentoBruto.toFixed(2).replace(".",",")}</div>
+            <div class="text-muted small">Faturamento bruto</div>
+          </div>
+        </div>
+      </div>
+      <div class="card p-3">
+        <h6 class="mb-3">🏆 Produtos mais vendidos — ${d.nomeMes} ${d.ano}</h6>
+        ${d.produtosMaisVendidos.length ? `
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr><th>Produto</th><th class="text-center">Qtd</th><th class="text-end">Total</th></tr>
+          </thead>
+          <tbody>
+            ${d.produtosMaisVendidos.map(p => `
+              <tr>
+                <td>${p.produto}</td>
+                <td class="text-center">${p.quantidade}</td>
+                <td class="text-end">R$ ${p.totalVendido.toFixed(2).replace(".",",")}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>` : "<p class=\"text-muted text-center mb-0\">Nenhum produto vendido neste período.</p>"}
+      </div>`;
+  } catch(e) { div.innerHTML = '<div class="text-danger text-center py-4">Erro ao carregar relatório.</div>'; }
+}
 
 // ── FUNCIONÁRIOS ──────────────────────────────────────────
 async function carregarFuncionarios() {
