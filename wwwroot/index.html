@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cafeteria Gato do Luar</title>
+  <title>ฅ^•ﻌ•^ฅ Cafeteria Gato do Luar ฅ^•ﻌ•^ฅ</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { background: #f8f5f0; }
@@ -34,7 +34,7 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card card p-4">
-    <h4 class="text-center mb-1" style="color:#02585a">☕ Gato do Luar</h4>
+    <h4 class="text-center mb-1" style="color:#02585a">☕😺 Gato do Luar 😺☕</h4>
     <p class="text-center text-muted small mb-4">Sistema de Gestão da Cafeteria</p>
     <div class="mb-3">
       <label class="form-label">E-mail</label>
@@ -53,7 +53,7 @@
 <div id="app-screen">
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-      <span class="navbar-brand">☕ Gato do Luar</span>
+      <span class="navbar-brand">☕😺 Gato do Luar 😺☕</span>
       <div class="d-flex gap-3 align-items-center">
         <a class="nav-link active" onclick="mostrarSecao('dashboard', this)">Início</a>
         <a class="nav-link" onclick="mostrarSecao('produtos', this)">Produtos</a>
@@ -62,9 +62,7 @@
         <a class="nav-link" onclick="mostrarSecao('pagamentos', this)">Pagamentos</a>
         <a class="nav-link" onclick="mostrarSecao('funcionarios', this)">Funcionários</a>
         <a class="nav-link" onclick="mostrarSecao('relatorio', this)">Relatório</a>
-        <a class="nav-link" onclick="mostrarSecao('funcionarios', this)">Funcionários</a>
-        <a class="nav-link" onclick="mostrarSecao('relatorio', this)">Relatório</a>
-        <span class="text-light small" id="usuario-nome"></span>
+       	        <span class="text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
       </div>
     </div>
@@ -219,26 +217,7 @@
       </div>
     </div>
 
-
-    <!-- FUNCIONÁRIOS -->
-    <div class="section" id="sec-funcionarios">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Funcionários</h5>
-        <button class="btn btn-primary btn-sm" onclick="abrirModalFuncionario()">+ Novo Funcionário</button>
-      </div>
-      <div class="card">
-        <div class="card-body p-0">
-          <table class="table mb-0">
-            <thead class="table-light">
-              <tr><th>Nome</th><th>E-mail</th><th>Cargo</th><th>Salário</th><th>Admissão</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody id="tbody-funcionarios"><tr><td colspan="7" class="text-center text-muted py-3">Carregando...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-
+  
     <!-- RELATÓRIO -->
     <div class="section" id="sec-relatorio">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -363,46 +342,7 @@
   </div>
 </div>
 
-<!-- MODAL FUNCIONÁRIO -->
-<div class="modal fade" id="modal-funcionario" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modal-func-titulo">Novo Funcionário</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="func-id">
-        <div class="mb-2"><label class="form-label">Nome *</label><input type="text" id="func-nome" class="form-control"></div>
-        <div class="mb-2"><label class="form-label">E-mail *</label><input type="email" id="func-email" class="form-control"></div>
-        <div class="mb-2" id="func-senha-grupo">
-          <label class="form-label">Senha *</label>
-          <input type="password" id="func-senha" class="form-control" placeholder="Mínimo 6 caracteres">
-        </div>
-        <div class="row">
-          <div class="col mb-2">
-            <label class="form-label">Cargo</label>
-            <select id="func-cargo" class="form-select">
-              <option value="Atendente">Atendente</option>
-              <option value="Barista">Barista</option>
-              <option value="Caixa">Caixa</option>
-              <option value="Gerente">Gerente</option>
-            </select>
-          </div>
-          <div class="col mb-2"><label class="form-label">Salário (R$)</label><input type="number" id="func-salario" class="form-control" step="0.01"></div>
-        </div>
-        <div class="mb-2" id="func-admissao-grupo">
-          <label class="form-label">Data de Admissão</label>
-          <input type="date" id="func-admissao" class="form-control">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarFuncionario()">Salvar</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <!-- MODAL PAGAMENTO -->
 <div class="modal fade" id="modal-pagamento" tabindex="-1">
@@ -836,8 +776,6 @@ async function cancelarPedido(id) {
 }
 
 
-
-
 // ── RELATÓRIO ─────────────────────────────────────────────
 async function carregarRelatorio() {
   const mes = document.getElementById('rel-mes').value;
@@ -925,26 +863,45 @@ async function carregarFuncionarios() {
 function abrirModalFuncionario() {
   document.getElementById('func-id').value = '';
   document.getElementById('modal-func-titulo').textContent = 'Novo Funcionário';
-  document.getElementById('func-senha-grupo').style.display = 'block';
-  document.getElementById('func-admissao-grupo').style.display = 'block';
-  ['nome','email','senha','salario'].forEach(f => document.getElementById('func-' + f).value = '');
-  document.getElementById('func-admissao').value = new Date().toISOString().split('T')[0];
-  new bootstrap.Modal(document.getElementById('modal-funcionario')).show();
+
+  document.getElementById('func-senha-div').style.display = 'block';
+  document.getElementById('func-admissao-div').style.display = 'block';
+
+  ['nome','email','senha','salario'].forEach(f =>
+    document.getElementById('func-' + f).value = ''
+  );
+
+  document.getElementById('func-admissao').value =
+    new Date().toISOString().split('T')[0];
+
+  new bootstrap.Modal(
+    document.getElementById('modal-funcionario')
+  ).show();
 }
 
 async function editarFuncionario(id) {
-  const res = await fetch(`/api/funcionarios/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const res = await fetch(`/api/funcionarios/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
   const data = await res.json();
   const f = data.dados;
+
   document.getElementById('func-id').value = f.idFuncionario;
   document.getElementById('func-nome').value = f.nome;
   document.getElementById('func-email').value = f.email;
   document.getElementById('func-cargo').value = f.cargo;
   document.getElementById('func-salario').value = f.salario;
-  document.getElementById('func-senha-grupo').style.display = 'none';
-  document.getElementById('func-admissao-grupo').style.display = 'none';
-  document.getElementById('modal-func-titulo').textContent = 'Editar Funcionário';
-  new bootstrap.Modal(document.getElementById('modal-funcionario')).show();
+
+  document.getElementById('func-senha-div').style.display = 'none';
+  document.getElementById('func-admissao-div').style.display = 'none';
+
+  document.getElementById('modal-func-titulo').textContent =
+    'Editar Funcionário';
+
+  new bootstrap.Modal(
+    document.getElementById('modal-funcionario')
+  ).show();
 }
 
 async function salvarFuncionario() {
@@ -990,150 +947,6 @@ async function deletarFuncionario(id) {
   if (data.sucesso) carregarFuncionarios();
 }
 
-
-
-// ── RELATÓRIO ─────────────────────────────────────────────
-async function carregarRelatorio() {
-  const mes = document.getElementById('rel-mes').value;
-  const ano = document.getElementById('rel-ano').value;
-  const div = document.getElementById('rel-conteudo');
-  div.innerHTML = '<div class="text-center py-4">Carregando...</div>';
-  try {
-    const res = await fetch(`/api/relatorio?ano=${ano}&mes=${mes}`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    const d = data.dados;
-    div.innerHTML = `
-      <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-          <div class="card p-3 text-center">
-            <div style="font-size:1.8rem">📋</div>
-            <div class="fw-bold fs-4">${d.totalPedidos}</div>
-            <div class="text-muted small">Total de pedidos</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3 text-center">
-            <div style="font-size:1.8rem">✅</div>
-            <div class="fw-bold fs-4">${d.pedidosEntregues}</div>
-            <div class="text-muted small">Entregues</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3 text-center">
-            <div style="font-size:1.8rem">❌</div>
-            <div class="fw-bold fs-4">${d.pedidosCancelados}</div>
-            <div class="text-muted small">Cancelados</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3 text-center">
-            <div style="font-size:1.8rem">💰</div>
-            <div class="fw-bold fs-4">R$ ${d.faturamentoBruto.toFixed(2).replace(".",",")}</div>
-            <div class="text-muted small">Faturamento bruto</div>
-          </div>
-        </div>
-      </div>
-      <div class="card p-3">
-        <h6 class="mb-3">🏆 Produtos mais vendidos — ${d.nomeMes} ${d.ano}</h6>
-        ${d.produtosMaisVendidos.length ? `
-        <table class="table table-sm mb-0">
-          <thead class="table-light">
-            <tr><th>Produto</th><th class="text-center">Qtd</th><th class="text-end">Total</th></tr>
-          </thead>
-          <tbody>
-            ${d.produtosMaisVendidos.map(p => `
-              <tr>
-                <td>${p.produto}</td>
-                <td class="text-center">${p.quantidade}</td>
-                <td class="text-end">R$ ${p.totalVendido.toFixed(2).replace(".",",")}</td>
-              </tr>`).join("")}
-          </tbody>
-        </table>` : "<p class=\"text-muted text-center mb-0\">Nenhum produto vendido neste período.</p>"}
-      </div>`;
-  } catch(e) { div.innerHTML = '<div class="text-danger text-center py-4">Erro ao carregar relatório.</div>'; }
-}
-
-// ── FUNCIONÁRIOS ──────────────────────────────────────────
-async function carregarFuncionarios() {
-  try {
-    const res = await fetch('/api/funcionarios', { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    const tbody = document.getElementById('tbody-funcionarios');
-    if (!data.dados?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Nenhum funcionário cadastrado.</td></tr>'; return; }
-    tbody.innerHTML = data.dados.map(f => `
-      <tr>
-        <td><strong>${f.nome}</strong></td>
-        <td>${f.email}</td>
-        <td>${f.cargo}</td>
-        <td>R$ ${f.salario.toFixed(2)}</td>
-        <td>${f.dataAdmissao}</td>
-        <td><span class="badge ${f.ativo ? 'bg-success' : 'bg-secondary'}">${f.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td>
-          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editarFuncionario(${f.idFuncionario})">Editar</button>
-          <button class="btn btn-sm btn-outline-danger" onclick="deletarFuncionario(${f.idFuncionario})">Desativar</button>
-        </td>
-      </tr>`).join('');
-  } catch(e) { mostrarToast('Erro ao carregar funcionários.', 'danger'); }
-}
-
-function abrirModalFuncionario() {
-  document.getElementById('func-id').value = '';
-  document.getElementById('modal-func-titulo').textContent = 'Novo Funcionário';
-  ['nome','email','senha','salario'].forEach(f => document.getElementById('func-' + f).value = '');
-  document.getElementById('func-admissao').value = new Date().toISOString().split('T')[0];
-  document.getElementById('func-senha-div').style.display = 'block';
-  document.getElementById('func-admissao-div').style.display = 'block';
-  new bootstrap.Modal(document.getElementById('modal-funcionario')).show();
-}
-
-async function editarFuncionario(id) {
-  const res = await fetch(`/api/funcionarios/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-  const data = await res.json();
-  const f = data.dados;
-  document.getElementById('func-id').value = f.idFuncionario;
-  document.getElementById('func-nome').value = f.nome;
-  document.getElementById('func-email').value = f.email;
-  document.getElementById('func-cargo').value = f.cargo;
-  document.getElementById('func-salario').value = f.salario;
-  document.getElementById('func-senha-div').style.display = 'none';
-  document.getElementById('func-admissao-div').style.display = 'none';
-  document.getElementById('modal-func-titulo').textContent = 'Editar Funcionário';
-  new bootstrap.Modal(document.getElementById('modal-funcionario')).show();
-}
-
-async function salvarFuncionario() {
-  const id = document.getElementById('func-id').value;
-  const body = id ? {
-    nome: document.getElementById('func-nome').value,
-    email: document.getElementById('func-email').value,
-    cargo: document.getElementById('func-cargo').value,
-    salario: parseFloat(document.getElementById('func-salario').value)
-  } : {
-    nome: document.getElementById('func-nome').value,
-    email: document.getElementById('func-email').value,
-    senha: document.getElementById('func-senha').value,
-    cargo: document.getElementById('func-cargo').value,
-    salario: parseFloat(document.getElementById('func-salario').value),
-    dataAdmissao: document.getElementById('func-admissao').value
-  };
-  const res = await fetch(id ? `/api/funcionarios/${id}` : '/api/funcionarios', {
-    method: id ? 'PUT' : 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body)
-  });
-  const data = await res.json();
-  bootstrap.Modal.getInstance(document.getElementById('modal-funcionario')).hide();
-  mostrarToast(data.mensagem || 'Salvo!', data.sucesso ? 'success' : 'danger');
-  if (data.sucesso) carregarFuncionarios();
-}
-
-async function deletarFuncionario(id) {
-  if (!confirm('Desativar este funcionário?')) return;
-  const res = await fetch(`/api/funcionarios/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-  const data = await res.json();
-  mostrarToast(data.mensagem, data.sucesso ? 'success' : 'danger');
-  if (data.sucesso) carregarFuncionarios();
-}
 
 // ── PAGAMENTOS ────────────────────────────────────────────
 async function carregarPagamentos() {
