@@ -81,23 +81,90 @@
 
 <!-- APP -->
 <div id="app-screen">
-  <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-dark">
     <div class="container-fluid">
       <span class="navbar-brand">☕ Gato do Luar</span>
-      <div class="d-flex flex-wrap gap-1 align-items-center">
-                <a class="nav-link active" onclick="mostrarSecao('dashboard', this)">Início</a>
-        <a class="nav-link" onclick="mostrarSecao('produtos', this)">Produtos</a>
-        <a class="nav-link" onclick="mostrarSecao('clientes', this)">Clientes</a>
-        <a class="nav-link" onclick="mostrarSecao('pedidos', this)">Pedidos</a>
-        <a class="nav-link" onclick="mostrarSecao('pagamentos', this)">Pagamentos</a>
-        <a class="nav-link" onclick="mostrarSecao('funcionarios', this)">Funcionários</a>
-        <a class="nav-link" onclick="mostrarSecao('relatorio', this)">Relatório</a>
+      <div class="d-flex align-items-center gap-2">
         <span class="text-light small" id="usuario-nome"></span>
         <button class="btn btn-sm btn-outline-light" onclick="sair()">Sair</button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navOffcanvas">
+          <span class="navbar-toggler-icon"></span>
+        </button>
       </div>
     </div>
   </nav>
 
+  ```html
+<!-- SUBSTITUA TODO O BLOCO DO MENU POR ESTE -->
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="navOffcanvas" style="background:#02585a; max-width:260px">
+  <div class="offcanvas-header" style="border-bottom:1px solid rgba(255,255,255,.2)">
+    <h6 class="offcanvas-title" style="color:#eed3b9">☕ Menu</h6>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body p-0">
+    <ul class="list-unstyled mb-0">
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('dashboard', this); fecharMenu(); return false;">
+          🏠 Início
+        </a>
+      </li>
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('produtos', this); fecharMenu(); return false;">
+          ☕ Produtos
+        </a>
+      </li>
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('clientes', this); fecharMenu(); return false;">
+          👥 Clientes
+        </a>
+      </li>
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('pedidos', this); fecharMenu(); return false;">
+          📋 Pedidos
+        </a>
+      </li>
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('pagamentos', this); fecharMenu(); return false;">
+          💳 Pagamentos
+        </a>
+      </li>
+
+      <li style="border-bottom:1px solid rgba(255,255,255,.1)">
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('funcionarios', this); fecharMenu(); return false;">
+          👤 Funcionários
+        </a>
+      </li>
+
+      <li>
+        <a class="nav-link px-4 py-3"
+           href="#"
+           onclick="mostrarSecao('relatorio', this); fecharMenu(); return false;">
+          📊 Relatório
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</div>
   <div class="container py-4">
 
     <!-- DASHBOARD -->
@@ -563,6 +630,15 @@ function mascararEmail(email) {
   return user.substring(0,2) + '***@' + domain;
 }
 
+// ── MENU MOBILE ───────────────────────────────────────────
+function fecharMenu() {
+  const offcanvas = document.getElementById('navOffcanvas');
+  if (offcanvas) {
+    const instance = bootstrap.Offcanvas.getInstance(offcanvas);
+    if (instance) instance.hide();
+  }
+}
+
 // ── AUTH ──────────────────────────────────────────────────
 async function fazerLogin() {
   const email = document.getElementById('login-email').value;
@@ -600,7 +676,8 @@ function iniciarApp() {
 // ── NAVEGAÇÃO ─────────────────────────────────────────────
 function mostrarSecao(sec, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-' + sec).classList.add('active');
+  const target = document.getElementById('sec-' + sec);
+  if (target) target.classList.add('active');
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   if (el) el.classList.add('active');
   if (sec === 'dashboard') carregarDashboard();
