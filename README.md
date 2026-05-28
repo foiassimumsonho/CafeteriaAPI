@@ -1,6 +1,6 @@
 # Cafeteria Gato do Luar – API REST
 
-> Projeto desenvolvido ao longo dos Sprints 02, 03 e 04 do curso de Desenvolvimento Backend.
+> Projeto desenvolvido ao longo dos Sprints 02, 03 e 04 do curso de Desenvolvimento Backend.  
 > Estudante: Amanda
 
 ---
@@ -17,13 +17,13 @@
 
 ## 📋 Descrição do Projeto
 
-Sistema web completo de gestão para a **Cafeteria Gato do Luar**, desenvolvido com ASP.NET Core 8 e MySQL. Permite o gerenciamento de produtos, clientes, funcionários, pedidos e pagamentos, com autenticação JWT e interface web responsiva.
+Sistema web completo de gestão para a **Cafeteria Gato do Luar**, desenvolvido com ASP.NET Core 8 e MySQL. Permite o gerenciamento de produtos, clientes, funcionários, pedidos e pagamentos, com autenticação JWT, interface web responsiva e relatório financeiro mensal.
 
 ---
 
 ## 🎯 Objetivo do Sistema
 
-Digitalizar e centralizar a operação da cafeteria, permitindo que funcionários registrem pedidos, controlem o estoque, gerenciem clientes e acompanhem o faturamento do dia em tempo real.
+Digitalizar e centralizar a operação da cafeteria, permitindo que funcionários registrem pedidos, controlem o estoque, gerenciem clientes e acompanhem o faturamento em tempo real.
 
 ---
 
@@ -35,6 +35,7 @@ Digitalizar e centralizar a operação da cafeteria, permitindo que funcionário
 | ORM | Entity Framework Core 8 |
 | Banco de dados | MySQL (Pomelo driver) |
 | Autenticação | JWT Bearer |
+| Hash de senhas | BCrypt.Net-Next |
 | Documentação | Swagger / OpenAPI |
 | Frontend | HTML5 + Bootstrap 5 + Vanilla JS |
 | Deploy API | Render (Docker) |
@@ -54,7 +55,7 @@ Interface Web (Bootstrap + JS)
          ↓
    Repositories          ← acesso ao banco via Entity Framework Core
          ↓
-      MySQL DB            ← banco sql10827819 (FreeSQLDatabase)
+      MySQL DB            ← banco remoto (FreeSQLDatabase)
 ```
 
 ### Estrutura de Pastas
@@ -62,6 +63,14 @@ Interface Web (Bootstrap + JS)
 ```
 CafeteriaAPI/
 ├── Controllers/          # Endpoints da API
+│   ├── AuthController.cs
+│   ├── ClientesController.cs
+│   ├── DashboardController.cs
+│   ├── FuncionariosController.cs
+│   ├── PagamentosController.cs
+│   ├── PedidosController.cs
+│   ├── ProdutosController.cs
+│   └── RelatorioController.cs
 ├── Models/               # Entidades do banco de dados
 ├── DTOs/                 # Objetos de transferência
 ├── Services/             # Regras de negócio
@@ -73,7 +82,7 @@ CafeteriaAPI/
 ├── Middleware/           # Tratamento global de erros
 ├── Migrations/           # Migrations do EF Core
 ├── wwwroot/              # Interface web (HTML + Bootstrap)
-├── Dockerfile            # Configuração para deploy
+├── Dockerfile            # Configuração para deploy no Render
 └── appsettings.json      # Configurações
 ```
 
@@ -115,13 +124,13 @@ dotnet run
 
 ---
 
-## 🔐 Autenticação
+## 🔐 Autenticação e Segurança
 
-O sistema usa **JWT Bearer Token**. Para acessar endpoints protegidos:
-
-1. Faça login em `POST /api/Auth/login`
-2. Copie o token retornado
-3. No Swagger, clique em **Authorize** e cole: `Bearer {token}`
+- Autenticação via **JWT Bearer Token** com expiração de 8 horas
+- Senhas armazenadas com **BCrypt hash**
+- Autorização por cargo — gerentes têm acesso a rotas administrativas
+- **Conformidade com a LGPD** — dados pessoais (nome, e-mail, CPF) coletados exclusivamente para gestão interna
+- CPF e e-mail **mascarados** na interface para proteção de dados sensíveis
 
 **Credenciais de demonstração:**
 ```
@@ -186,28 +195,36 @@ Senha: cafeteria123
 |---|---|---|---|
 | GET | /api/Dashboard | Resumo do dia | ✅ |
 
+### Relatório
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | /api/Relatorio?ano=2026&mes=5 | Relatório financeiro mensal | ✅ |
+
 ---
 
 ## 📐 Regras de Negócio
 
-- Apenas funcionários com cargo **Gerente** podem criar/editar/desativar produtos e funcionários
-- Ao criar um pedido, o estoque dos produtos é reduzido automaticamente
-- Ao cancelar um pedido, o estoque é devolvido automaticamente
-- Um pedido não pode ser alterado após ser cancelado
-- Cada pedido só pode ter um pagamento registrado
-- Senhas são armazenadas com hash **BCrypt**
-- Tokens JWT expiram em 8 horas
+- Apenas **Gerentes** podem criar/editar/desativar produtos e funcionários
+- Ao criar um pedido, o **estoque é reduzido automaticamente**
+- Ao cancelar um pedido, o **estoque é devolvido automaticamente**
+- Um pedido cancelado **não pode ser reaberto**
+- Cada pedido só pode ter **um pagamento registrado**
+- Senhas armazenadas com **BCrypt hash** — nunca em texto puro
+- Tokens JWT expiram em **8 horas**
 
 ---
 
 ## 🖥️ Funcionalidades da Interface Web
 
-- **Dashboard** — resumo do dia (pedidos, faturamento, status)
+- **Dashboard** — resumo do dia (pedidos, faturamento, status por categoria)
 - **Produtos** — listagem, cadastro, edição e desativação
-- **Clientes** — listagem, cadastro, edição e desativação
-- **Pedidos** — abertura de pedidos com múltiplos itens, atualização de status e cancelamento
-- **Pagamentos** — registro de pagamentos com forma (Dinheiro, Crédito, Débito, Pix)
+- **Clientes** — listagem com dados mascarados (LGPD), cadastro, edição e desativação
+- **Pedidos** — abertura com múltiplos itens, atualização de status e cancelamento
+- **Pagamentos** — registro com forma (Dinheiro, Crédito, Débito, Pix)
 - **Funcionários** — listagem, cadastro e edição (apenas Gerentes)
+- **Relatório Financeiro** — faturamento mensal, produtos mais vendidos, pedidos entregues e cancelados
+- **Interface responsiva** — funciona em desktop, tablet e celular
+- **Banner LGPD** — aviso de coleta de dados na primeira visita
 
 ---
 
